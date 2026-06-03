@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: #f4f2ed;
+  --foreground: #050505;
+  --accent: #175cff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(5, 5, 5, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.035) 1px, transparent 1px),
+    var(--background);
+  background-size: 28px 28px;
+  color: var(--foreground);
+}
+
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+@layer base {
+  a,
+  button {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-electric-blue focus-visible:ring-offset-2 focus-visible:ring-offset-bone;
+  }
+}
+
+@layer components {
+  .brutal-border {
+    @apply border-2 border-ink shadow-brutal;
+  }
+
+  .brutal-border-blue {
+    @apply border-2 border-ink shadow-brutal-blue;
+  }
+}
