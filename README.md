@@ -79,6 +79,13 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Live Deployment
+
+- Storefront: [https://vip-raiments.vercel.app](https://vip-raiments.vercel.app)
+- Admin login: [https://vip-raiments.vercel.app/login](https://vip-raiments.vercel.app/login)
+
+See `DEPLOYMENT_GUIDE.md` for Supabase and Vercel environment setup.
+
 ## Build For Production
 
 ```bash
