@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ShoppingBag } from "lucide-react";
-import { featuredProducts } from "@/data/products";
+import { ArrowLeft } from "lucide-react";
+import { ProductAddToCart } from "@/components/features/ProductAddToCart";
+import { getActiveProducts, getProductBySlug } from "@/lib/products/get-products";
 import { formatInr } from "@/lib/utils";
 
 type ProductPageProps = {
@@ -11,15 +12,16 @@ type ProductPageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  return featuredProducts.map((product) => ({
+export async function generateStaticParams() {
+  const products = await getActiveProducts();
+  return products.map((product) => ({
     slug: product.slug
   }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = featuredProducts.find((item) => item.slug === slug);
+  const product = await getProductBySlug(slug);
 
   return {
     title: product ? `${product.name} | VIP Raiments` : "Product | VIP Raiments"
@@ -28,7 +30,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = featuredProducts.find((item) => item.slug === slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
@@ -74,13 +76,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <p>Available sizes: {product.sizes.join(", ")}</p>
           <p>Inventory: {product.stock} units</p>
         </div>
-        <button
-          type="button"
-          className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 border-2 border-ink bg-ink px-5 text-sm font-black uppercase text-white shadow-brutal-blue transition-transform hover:-translate-y-0.5 sm:w-auto"
-        >
-          <ShoppingBag className="h-4 w-4" />
-          Add to cart
-        </button>
+        <ProductAddToCart product={product} />
       </div>
     </section>
   );

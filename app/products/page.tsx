@@ -1,16 +1,18 @@
 import { ProductGrid } from "@/components/features/ProductGrid";
-import { featuredProducts } from "@/data/products";
+import { getActiveProducts } from "@/lib/products/get-products";
 
 export const metadata = {
   title: "Products | VIP Raiments"
 };
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const products = await getActiveProducts();
+
   return (
     <ProductGrid
       eyebrow="Collection"
       title="All drops"
-      products={featuredProducts}
+      products={products}
       className="pt-12"
     />
   );

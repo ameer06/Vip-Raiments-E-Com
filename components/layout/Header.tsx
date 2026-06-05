@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, ShoppingBag, UserRound } from "lucide-react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useState } from "react";
+import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -13,6 +14,7 @@ const navItems = [
 ];
 
 export function Header() {
+  const { count, hydrated } = useCart();
   const { scrollY } = useScroll();
   const [isPinned, setIsPinned] = useState(true);
   const [lastY, setLastY] = useState(0);
@@ -57,8 +59,11 @@ export function Header() {
           </IconLink>
           <IconLink href="/cart" label="Cart" className="relative">
             <ShoppingBag className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center border border-ink bg-electric-blue px-1 text-[10px] font-black text-white">
-              0
+            <span
+              className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center border border-ink bg-electric-blue px-1 text-[10px] font-black text-white"
+              suppressHydrationWarning
+            >
+              {hydrated ? count : 0}
             </span>
           </IconLink>
           <button

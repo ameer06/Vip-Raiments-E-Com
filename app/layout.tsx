@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: "VIP Raiments | Premium Streetwear Drops",
   description:
     "A premium, mobile-first commerce experience for limited clothing drops.",
-  metadataBase: new URL("https://vip-raiments.example")
+  metadataBase: new URL("https://vip-raiments.vercel.app")
 };
 
 export default function RootLayout({

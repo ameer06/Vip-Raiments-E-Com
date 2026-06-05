@@ -1,3 +1,5 @@
+import { CartProvider } from "@/components/providers/CartProvider";
+import { CartToast } from "@/components/features/CartToast";
 import { Header } from "@/components/layout/Header";
 
 type LayoutProps = {
@@ -6,9 +8,12 @@ type LayoutProps = {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-bone text-ink">
-      <Header />
-      <main>{children}</main>
-    </div>
+    <CartProvider>
+      <div className="min-h-screen bg-bone text-ink">
+        <Header />
+        <main>{children}</main>
+        <CartToast />
+      </div>
+    </CartProvider>
   );
 }

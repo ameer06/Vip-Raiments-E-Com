@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Product } from "@/data/products";
-import { useCart } from "@/hooks/useCart";
+import { AddToCartButton } from "@/components/features/AddToCartButton";
 import { formatInr } from "@/lib/utils";
 
 type ProductCardProps = {
@@ -13,8 +12,6 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addItem } = useCart();
-
   return (
     <motion.article
       whileHover={{ y: -4 }}
@@ -60,14 +57,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <p className="text-sm font-black">{formatInr(product.price)}</p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => addItem(product.id)}
-          className="inline-flex h-10 items-center justify-center gap-2 border-2 border-ink bg-bone px-3 text-xs font-black uppercase transition-colors hover:bg-electric-blue hover:text-white"
-        >
-          <ShoppingBag className="h-4 w-4" />
-          Quick add
-        </button>
+        <AddToCartButton
+          product={product}
+          label="Quick add"
+          className="h-10 bg-bone px-3 text-xs shadow-none hover:bg-electric-blue hover:text-white"
+        />
       </div>
     </motion.article>
   );
