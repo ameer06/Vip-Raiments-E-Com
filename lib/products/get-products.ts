@@ -1,7 +1,8 @@
 import { featuredProducts, type Product } from "@/data/products";
 import { mapProductRow, mapProductToRow, type ProductRow } from "@/lib/products/map";
 import { createSupabaseAdminClient, hasSupabaseServiceRole } from "@/lib/supabase/admin";
-import { createSupabaseServerClient, hasSupabaseEnv } from "@/lib/supabase/server";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
+import { hasSupabaseEnv } from "@/lib/supabase/server";
 
 function getStaticActiveProducts() {
   return featuredProducts.filter((product) => product.status === "active");
@@ -12,7 +13,11 @@ function getStaticAllProducts() {
 }
 
 async function fetchFromSupabase(activeOnly: boolean) {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
+  if (!supabase) {
+    return null;
+  }
+
   let query = supabase.from("products").select("*").order("created_at", {
     ascending: false
   });
@@ -44,7 +49,11 @@ export async function getAllProducts(): Promise<Product[]> {
     return getStaticAllProducts();
   }
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
+  if (!supabase) {
+    return getStaticAllProducts();
+  }
+
   const { data, error } = await supabase
     .from("products")
     .select("*")
