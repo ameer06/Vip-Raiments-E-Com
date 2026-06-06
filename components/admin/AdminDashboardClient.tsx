@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LogOut } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatInr } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export function AdminDashboardClient() {
   const [draft, setDraft] = useState<Product>(emptyProduct());
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -88,15 +90,30 @@ export function AdminDashboardClient() {
     }
   }
 
+  async function handleLogout() {
+    setLoggingOut(true);
+    await fetch("/api/auth/logout", { method: "POST" });
+  }
+
   if (loading) {
     return <p className="text-sm font-bold">Loading admin data…</p>;
   }
 
   return (
     <>
-      {message ? (
-        <p className="mb-4 border-2 border-ink bg-bone p-3 text-sm font-bold">{message}</p>
-      ) : null}
+      <div className="mb-6 flex items-center justify-between">
+        {message ? (
+          <p className="border-2 border-ink bg-bone p-3 text-sm font-bold">{message}</p>
+        ) : null}
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="ml-auto flex items-center gap-2 h-11 border-2 border-ink bg-ink px-4 text-sm font-black uppercase text-white hover:bg-ink/90 disabled:opacity-50"
+        >
+          <LogOut className="h-4 w-4" />
+          {loggingOut ? "Logging out..." : "Logout"}
+        </button>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <form
@@ -152,7 +169,11 @@ export function AdminDashboardClient() {
                 {products.map((product) => (
                   <tr
                     key={product.id}
-                    className="cursor-pointer font-bold hover:bg-bone/60"
+                    className={`cursor-pointer font-bold transition-colors ${
+                      draft.id === product.id
+                        ? "bg-electric-blue/20 border-l-4 border-electric-blue"
+                        : "hover:bg-bone/60"
+                    }`}
                     onClick={() => setDraft(product)}
                   >
                     <td className="border-b border-ink/15 p-4">{product.name}</td>
