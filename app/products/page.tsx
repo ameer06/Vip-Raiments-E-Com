@@ -13,7 +13,7 @@ export default async function ProductsPage() {
       eyebrow="Collection"
       title="All drops"
       products={products}
-      className="pt-12"
+      className="pt-8 sm:pt-12"
     />
   );
 }

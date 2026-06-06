@@ -12,7 +12,7 @@ export function ProductAddToCart({ product }: ProductAddToCartProps) {
   const [size, setSize] = useState(product.sizes[0]);
 
   return (
-    <div className="mt-8 grid gap-4">
+    <div className="mt-6 grid gap-4 sm:mt-8">
       <fieldset>
         <legend className="mb-2 text-xs font-black uppercase">Size</legend>
         <div className="flex flex-wrap gap-2">

@@ -22,9 +22,12 @@ export function CheckoutForm() {
 
   if (items.length === 0) {
     return (
-      <div className="border-2 border-ink bg-white p-8 text-center shadow-brutal">
+      <div className="border-2 border-ink bg-white p-6 text-center shadow-brutal sm:p-8">
         <p className="font-black uppercase">Nothing to checkout</p>
-        <Link href="/cart" className="mt-4 inline-block text-sm font-bold underline">
+        <Link
+          href="/cart"
+          className="mt-4 inline-flex h-11 items-center justify-center border-2 border-ink bg-ink px-5 text-sm font-black uppercase text-white sm:mt-5"
+        >
           Return to cart
         </Link>
       </div>
@@ -62,8 +65,8 @@ export function CheckoutForm() {
       onSubmit={handleSubmit}
       className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]"
     >
-      <div className="grid gap-4 border-2 border-ink bg-white p-5 shadow-brutal">
-        <h2 className="text-2xl font-black uppercase">Shipping</h2>
+      <div className="grid gap-4 border-2 border-ink bg-white p-4 shadow-brutal sm:p-5">
+        <h2 className="text-xl font-black uppercase sm:text-2xl">Shipping</h2>
         <CheckoutField
           label="Full name"
           value={form.customerName}
@@ -102,18 +105,25 @@ export function CheckoutForm() {
         />
       </div>
 
-      <aside className="h-fit border-2 border-ink bg-white p-5 shadow-brutal-blue lg:sticky lg:top-24">
-        <h2 className="text-2xl font-black uppercase">Payment (mock)</h2>
+      <aside className="h-fit border-2 border-ink bg-white p-4 shadow-brutal-blue sm:p-5 lg:sticky lg:top-24">
+        <h2 className="text-xl font-black uppercase sm:text-2xl">Payment (mock)</h2>
         <p className="mt-3 text-sm font-semibold text-ink/65">
           No real charge. Click pay to simulate a successful payment and create
           an order in Supabase.
         </p>
-        <p className="mt-6 text-sm font-bold">Total</p>
-        <p className="text-2xl font-black">{formatInr(subtotal)}</p>
+        <div className="mt-5 flex items-center justify-between gap-4 sm:mt-6">
+          <p className="text-sm font-bold">Total</p>
+          <p className="text-xl font-black sm:text-2xl">{formatInr(subtotal)}</p>
+        </div>
         <ul className="mt-4 grid gap-2 text-xs font-semibold text-ink/60">
           {items.map((item) => (
-            <li key={item.lineId}>
-              {item.name} × {item.quantity} ({item.size})
+            <li
+              key={item.lineId}
+              className="flex items-start justify-between gap-3"
+            >
+              <span className="min-w-0 truncate">
+                {item.name} × {item.quantity} ({item.size})
+              </span>
             </li>
           ))}
         </ul>
@@ -125,7 +135,7 @@ export function CheckoutForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-6 inline-flex h-12 w-full items-center justify-center border-2 border-ink bg-ink text-sm font-black uppercase text-white disabled:opacity-60"
+          className="mt-5 inline-flex h-12 w-full items-center justify-center border-2 border-ink bg-ink text-sm font-black uppercase text-white disabled:opacity-60 sm:mt-6"
         >
           {isSubmitting ? "Processing…" : "Pay with mock gateway"}
         </button>

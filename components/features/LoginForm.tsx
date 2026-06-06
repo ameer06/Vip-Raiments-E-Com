@@ -96,7 +96,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="inline-flex h-11 items-center justify-center gap-2 border-2 border-ink bg-ink px-4 text-sm font-black uppercase text-white shadow-brutal-blue disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-11 w-full items-center justify-center gap-2 border-2 border-ink bg-ink px-4 text-sm font-black uppercase text-white shadow-brutal-blue disabled:cursor-not-allowed disabled:opacity-60"
       >
         <LogIn className="h-4 w-4" />
         {isSubmitting ? "Signing in" : "Sign in"}

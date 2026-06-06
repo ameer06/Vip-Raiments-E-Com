@@ -23,7 +23,7 @@ export function Marquee({ items }: MarqueeProps) {
         {loop.map((item, index) => (
           <span
             key={`${item}-${index}`}
-            className="inline-flex items-center gap-8 text-sm font-black uppercase tracking-normal"
+            className="inline-flex items-center gap-8 text-xs font-black uppercase tracking-normal sm:text-sm"
           >
             {item}
             <span className="h-3 w-3 bg-electric-blue" aria-hidden="true" />
