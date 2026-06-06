@@ -26,7 +26,7 @@ export function ProductCard({ product }: ProductCardProps) {
           src={product.images[0]}
           alt={product.name}
           fill
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1024px) 25vw, 50vw"
           className="object-cover grayscale transition duration-500 group-hover:opacity-0"
           priority={product.isPriority}
         />
@@ -34,33 +34,36 @@ export function ProductCard({ product }: ProductCardProps) {
           src={product.images[1]}
           alt=""
           fill
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1024px) 25vw, 50vw"
           className="object-cover opacity-0 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
         />
         {product.badge ? (
-          <span className="absolute left-3 top-3 border-2 border-ink bg-electric-blue px-2 py-1 text-[11px] font-black uppercase text-white">
+          <span className="absolute left-2 top-2 border-2 border-ink bg-electric-blue px-1.5 py-0.5 text-[10px] font-black uppercase text-white sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-[11px]">
             {product.badge}
           </span>
         ) : null}
       </Link>
 
-      <div className="grid gap-4 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-base font-black uppercase tracking-normal">
+      <div className="grid gap-2 p-2.5 sm:gap-4 sm:p-4">
+        <div className="flex items-start justify-between gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-xs font-black uppercase tracking-normal sm:text-base">
               <Link href={`/products/${product.slug}`}>{product.name}</Link>
             </h3>
-            <p className="mt-1 text-sm font-semibold text-ink/60">
+            <p className="mt-0.5 truncate text-xs font-semibold text-ink/60 sm:mt-1 sm:text-sm">
               {product.color}
             </p>
           </div>
-          <p className="text-sm font-black">{formatInr(product.price)}</p>
+          <p className="shrink-0 text-right text-xs font-black leading-tight sm:text-sm">
+            {formatInr(product.price)}
+          </p>
         </div>
 
         <AddToCartButton
           product={product}
           label="Quick add"
-          className="h-10 bg-bone px-3 text-xs shadow-none hover:bg-electric-blue hover:text-white"
+          fullWidth
+          className="h-8 bg-bone px-2 text-[10px] shadow-none hover:bg-electric-blue hover:text-white sm:h-10 sm:px-3 sm:text-xs"
         />
       </div>
     </motion.article>
