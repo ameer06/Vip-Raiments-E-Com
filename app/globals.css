@@ -49,4 +49,10 @@ body {
   .brutal-border-blue {
     @apply border-2 border-ink shadow-brutal-blue;
   }
+
+  /* Reserve space so offset brutal shadows are not clipped */
+  .brutal-shadow-room {
+    padding-right: 5px;
+    padding-bottom: 5px;
+  }
 }

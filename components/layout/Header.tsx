@@ -44,10 +44,10 @@ export function Header() {
         transition={{ duration: 0.22, ease: "easeOut" }}
         className="sticky top-0 z-50 border-b-2 border-ink/90 bg-bone/72 backdrop-blur-xl"
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:px-8">
           <Link
             href="/"
-            className="group flex min-w-0 shrink items-center gap-2"
+            className="group flex min-w-0 items-center gap-2 justify-self-start"
             onClick={() => setIsMenuOpen(false)}
           >
             <span className="grid h-9 w-9 shrink-0 place-items-center border-2 border-ink bg-electric-blue text-sm font-black text-white shadow-brutal transition-transform group-hover:-translate-y-0.5">
@@ -58,19 +58,22 @@ export function Header() {
             </span>
           </Link>
 
-          <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
+          <nav
+            aria-label="Primary"
+            className="hidden items-center gap-7 md:flex md:justify-self-center"
+          >
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-bold uppercase tracking-normal text-ink/72 transition-colors hover:text-electric-blue"
+                className="inline-flex h-16 items-center text-sm font-bold uppercase leading-none tracking-normal text-ink/72 transition-colors hover:text-electric-blue"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center justify-self-end gap-1.5 sm:gap-2">
             <IconLink href="/account" label="Account" className="hidden sm:grid">
               <UserRound className="h-5 w-5" />
             </IconLink>
