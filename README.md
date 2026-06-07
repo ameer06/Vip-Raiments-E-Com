@@ -20,6 +20,7 @@ components/
     ProductCard.tsx
     ProductGrid.tsx
   layout/
+    Footer.tsx
     Header.tsx
     Layout.tsx
   ui/
