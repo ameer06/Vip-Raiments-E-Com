@@ -45,7 +45,7 @@ export function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       <div className="grid gap-2 p-2.5 sm:gap-4 sm:p-4">
-        <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="flex items-baseline justify-between gap-2 sm:gap-3">
           <div className="min-w-0 flex-1">
             <h3 className="truncate text-xs font-black uppercase tracking-normal sm:text-base">
               <Link href={`/products/${product.slug}`}>{product.name}</Link>
