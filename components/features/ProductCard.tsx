@@ -45,16 +45,16 @@ export function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       <div className="grid gap-2 p-2.5 sm:gap-4 sm:p-4">
-        <div className="flex items-baseline justify-between gap-2 sm:gap-3">
-          <div className="min-w-0 flex-1">
-            <h3 className="truncate text-xs font-black uppercase tracking-normal sm:text-base">
+        <div className="flex items-start justify-between gap-1 overflow-hidden sm:gap-2">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <h3 className="truncate text-xs font-black uppercase tracking-normal sm:text-sm">
               <Link href={`/products/${product.slug}`}>{product.name}</Link>
             </h3>
-            <p className="mt-0.5 truncate text-xs font-semibold text-ink/60 sm:mt-1 sm:text-sm">
+            <p className="mt-0.5 truncate text-xs font-semibold text-ink/60 sm:mt-1">
               {product.color}
             </p>
           </div>
-          <p className="shrink-0 text-right text-xs font-black leading-tight sm:text-sm">
+          <p className="shrink-0 whitespace-nowrap text-right text-xs font-black sm:text-sm">
             {formatInr(product.price)}
           </p>
         </div>
