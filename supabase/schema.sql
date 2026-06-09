@@ -14,6 +14,7 @@ create table if not exists public.products (
   front_image_url text not null,
   hover_image_url text not null,
   is_priority boolean not null default false,
+  category text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -93,6 +93,7 @@ export function AdminDashboardClient() {
   async function handleLogout() {
     setLoggingOut(true);
     await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
   }
 
   if (loading) {

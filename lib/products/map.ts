@@ -13,6 +13,7 @@ export type ProductRow = {
   front_image_url: string;
   hover_image_url: string;
   is_priority: boolean;
+  category: string | null;
 };
 
 export function mapProductRow(row: ProductRow): Product {
@@ -27,7 +28,8 @@ export function mapProductRow(row: ProductRow): Product {
     status: row.status,
     badge: row.badge ?? undefined,
     images: [row.front_image_url, row.hover_image_url],
-    isPriority: row.is_priority
+    isPriority: row.is_priority,
+    category: row.category ?? undefined,
   };
 }
 
@@ -44,6 +46,7 @@ export function mapProductToRow(product: Product): ProductRow {
     badge: product.badge ?? null,
     front_image_url: product.images[0],
     hover_image_url: product.images[1],
-    is_priority: product.isPriority ?? false
+    is_priority: product.isPriority ?? false,
+    category: product.category ?? null,
   };
 }
