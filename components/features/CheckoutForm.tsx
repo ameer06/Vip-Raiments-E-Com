@@ -1,10 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 import { formatInr } from "@/lib/utils";
+
+const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+const hasRazorpay =
+  RAZORPAY_KEY_ID && !RAZORPAY_KEY_ID.startsWith("your-");
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window.Razorpay !== "undefined") {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 export function CheckoutForm() {
   const router = useRouter();
@@ -34,10 +53,108 @@ export function CheckoutForm() {
     );
   }
 
+  const payWithRazorpay = useCallback(async () => {
+    if (!hasRazorpay) return false;
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      setError("Failed to load payment gateway. Try the mock option.");
+      return false;
+    }
+
+    const orderRes = await fetch("/api/payments/razorpay/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cartItems: items.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        email: form.email,
+        customerName: form.customerName
+      })
+    });
+
+    const orderData = await orderRes.json();
+    if (!orderRes.ok || !orderData.ok) {
+      setError(orderData.error ?? "Failed to create payment order.");
+      return false;
+    }
+
+    return new Promise<boolean>((resolve) => {
+      const razorpay = new window.Razorpay({
+        key: RAZORPAY_KEY_ID!,
+        amount: orderData.amount * 100,
+        currency: "INR",
+        name: "VIP Raiments",
+        description: `Order for ${orderData.customer_name}`,
+        order_id: orderData.razorpay_order_id,
+        prefill: {
+          name: orderData.customer_name,
+          email: orderData.email
+        },
+        theme: { color: "#175cff" },
+        handler: async (response) => {
+          const verifyRes = await fetch("/api/payments/razorpay/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              cartItems: items.map((item) => ({
+                productId: item.productId,
+                slug: item.slug,
+                name: item.name,
+                price: item.price,
+                size: item.size,
+                quantity: item.quantity
+              })),
+              email: form.email,
+              customerName: form.customerName,
+              phone: form.phone || undefined,
+              addressLine: form.addressLine,
+              city: form.city,
+              postalCode: form.postalCode
+            })
+          });
+
+          const verifyData = await verifyRes.json();
+          if (!verifyRes.ok || !verifyData.ok) {
+            setError(verifyData.error ?? "Payment verification failed.");
+            resolve(false);
+            return;
+          }
+
+          clearCart();
+          router.push(`/order/${verifyData.orderId}`);
+          resolve(true);
+        },
+        modal: {
+          ondismiss: () => {
+            setIsSubmitting(false);
+            resolve(false);
+          }
+        }
+      });
+
+      razorpay.open();
+    });
+  }, [items, form, clearCart, router]);
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setIsSubmitting(true);
     setError("");
+
+    if (hasRazorpay) {
+      const paid = await payWithRazorpay();
+      if (paid) return;
+      setIsSubmitting(false);
+      return;
+    }
 
     const response = await fetch("/api/checkout/mock", {
       method: "POST",
@@ -106,11 +223,20 @@ export function CheckoutForm() {
       </div>
 
       <aside className="h-fit border-2 border-ink bg-white p-4 shadow-brutal-blue sm:p-5 lg:sticky lg:top-24">
-        <h2 className="text-xl font-black uppercase sm:text-2xl">Payment (mock)</h2>
-        <p className="mt-3 text-sm font-semibold text-ink/65">
-          No real charge. Click pay to simulate a successful payment and create
-          an order in Supabase.
-        </p>
+        <h2 className="text-xl font-black uppercase sm:text-2xl">
+          {hasRazorpay ? "Payment" : "Payment (mock)"}
+        </h2>
+        {hasRazorpay ? (
+          <p className="mt-3 text-sm font-semibold text-ink/65">
+            Pay securely via Razorpay. Your card or UPI details are processed
+            by Razorpay, not stored here.
+          </p>
+        ) : (
+          <p className="mt-3 text-sm font-semibold text-ink/65">
+            No real charge. Click pay to simulate a successful payment and create
+            an order in Supabase. Set <code className="bg-bone px-1">NEXT_PUBLIC_RAZORPAY_KEY_ID</code> to enable live payments.
+          </p>
+        )}
         <div className="mt-5 flex items-center justify-between gap-4 sm:mt-6">
           <p className="text-sm font-bold">Total</p>
           <p className="text-xl font-black sm:text-2xl">{formatInr(subtotal)}</p>
@@ -137,7 +263,11 @@ export function CheckoutForm() {
           disabled={isSubmitting}
           className="mt-5 inline-flex h-12 w-full items-center justify-center border-2 border-ink bg-ink text-sm font-black uppercase text-white disabled:opacity-60 sm:mt-6"
         >
-          {isSubmitting ? "Processing…" : "Pay with mock gateway"}
+          {isSubmitting
+            ? "Processing…"
+            : hasRazorpay
+              ? `Pay ₹${subtotal} via Razorpay`
+              : "Pay with mock gateway"}
         </button>
       </aside>
     </form>
