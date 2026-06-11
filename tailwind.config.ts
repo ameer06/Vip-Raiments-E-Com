@@ -10,13 +10,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#050505",
-        bone: "#f4f2ed",
-        "electric-blue": "#175cff"
+        ink: "#000000",
+        bone: "#fafafa",
+        "electric-blue": "#000000"
       },
       boxShadow: {
-        brutal: "5px 5px 0 #050505",
-        "brutal-blue": "5px 5px 0 #175cff"
+        brutal: "0 1px 3px 0 rgba(0,0,0,0.08)",
+        "brutal-blue": "0 1px 3px 0 rgba(0,0,0,0.08)"
       }
     }
   },

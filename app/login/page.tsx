@@ -10,7 +10,7 @@ export default function LoginPage() {
     <section className="mx-auto grid min-h-[calc(100svh-4rem)] max-w-5xl items-center px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div className="border-2 border-ink bg-white p-4 shadow-brutal-blue sm:p-5">
-          <p className="mb-2 text-xs font-black uppercase text-electric-blue">
+          <p className="mb-2 text-xs font-black uppercase text-ink/50">
             Protected access
           </p>
           <h1 className="text-3xl font-black uppercase leading-none tracking-normal sm:text-4xl lg:text-6xl">

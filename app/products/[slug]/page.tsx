@@ -59,12 +59,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="lg:sticky lg:top-24 lg:self-start">
         <Link
           href="/products"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-black uppercase text-ink/70 hover:text-electric-blue sm:mb-6"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-black uppercase text-ink/70 hover:text-ink sm:mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to drops
         </Link>
-        <p className="mb-2 text-xs font-black uppercase text-electric-blue sm:mb-3">
+        <p className="mb-2 text-xs font-black uppercase text-ink/50 sm:mb-3">
           {product.badge ?? "Limited"}
         </p>
         <h1 className="text-3xl font-black uppercase leading-none tracking-normal sm:text-5xl lg:text-6xl">

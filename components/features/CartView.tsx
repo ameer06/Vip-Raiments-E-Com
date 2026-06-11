@@ -47,7 +47,7 @@ export function CartView() {
             <div className="min-w-0">
               <Link
                 href={`/products/${item.slug}`}
-                className="block truncate text-sm font-black uppercase hover:text-electric-blue sm:text-lg"
+                className="block truncate text-sm font-black uppercase hover:text-ink sm:text-lg"
               >
                 {item.name}
               </Link>

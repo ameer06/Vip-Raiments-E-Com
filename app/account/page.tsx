@@ -9,7 +9,7 @@ export default function AccountPage() {
   return (
     <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="border-2 border-ink bg-white p-5 shadow-brutal-blue">
-        <p className="mb-2 text-xs font-black uppercase text-electric-blue">
+        <p className="mb-2 text-xs font-black uppercase text-ink/50">
           Account access
         </p>
         <h1 className="text-4xl font-black uppercase leading-none tracking-normal sm:text-6xl">
@@ -37,7 +37,7 @@ export default function AccountPage() {
         </article>
 
         <article className="border-2 border-ink bg-white p-5 shadow-brutal">
-          <div className="mb-4 grid h-11 w-11 place-items-center border-2 border-ink bg-electric-blue text-white">
+          <div className="mb-4 grid h-11 w-11 place-items-center border-2 border-ink bg-ink text-white">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <h2 className="text-2xl font-black uppercase tracking-normal">

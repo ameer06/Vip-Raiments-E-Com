@@ -191,7 +191,7 @@ export function UPIPayment({
         {upiLink && (
           <a
             href={upiLink}
-            className="text-center text-xs font-semibold text-electric-blue underline"
+            className="text-center text-xs font-semibold text-ink underline"
           >
             Tap to open UPI app again
           </a>
@@ -221,7 +221,7 @@ export function UPIPayment({
             </div>
             <a
               href={upiLink}
-              className="text-center text-xs font-semibold text-electric-blue underline"
+              className="text-center text-xs font-semibold text-ink underline"
             >
               Open UPI app again
             </a>

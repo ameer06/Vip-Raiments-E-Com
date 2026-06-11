@@ -50,7 +50,7 @@ export function Header() {
             className="group flex min-w-0 items-center gap-2 justify-self-start"
             onClick={() => setIsMenuOpen(false)}
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center border-2 border-ink bg-electric-blue text-sm font-black text-white shadow-brutal transition-transform group-hover:-translate-y-0.5">
+            <span className="grid h-9 w-9 shrink-0 place-items-center border-2 border-ink bg-ink text-sm font-black text-white transition-transform group-hover:-translate-y-0.5">
               VR
             </span>
             <span className="truncate text-sm font-black uppercase tracking-normal sm:text-base">
@@ -66,7 +66,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="inline-flex h-16 items-center text-sm font-bold uppercase leading-none tracking-normal text-ink/72 transition-colors hover:text-electric-blue"
+                className="inline-flex h-16 items-center text-sm font-bold uppercase leading-none tracking-normal text-ink/72 transition-colors hover:text-ink"
               >
                 {item.label}
               </Link>
@@ -80,7 +80,7 @@ export function Header() {
             <IconLink href="/cart" label="Cart" className="relative">
               <ShoppingBag className="h-5 w-5" />
               <span
-                className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center border border-ink bg-electric-blue px-1 text-[10px] font-black text-white"
+                className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center border border-ink bg-ink px-1 text-[10px] font-black text-white"
                 suppressHydrationWarning
               >
                 {hydrated ? count : 0}
@@ -122,7 +122,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="border-b border-ink/10 py-4 text-lg font-black uppercase tracking-normal text-ink transition-colors hover:text-electric-blue"
+                    className="border-b border-ink/10 py-4 text-lg font-black uppercase tracking-normal text-ink transition-colors hover:text-ink/50"
                   >
                     {item.label}
                   </Link>
@@ -132,7 +132,7 @@ export function Header() {
                 <Link
                   href="/account"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 py-3 text-sm font-bold uppercase text-ink/70 hover:text-electric-blue"
+                  className="flex items-center gap-3 py-3 text-sm font-bold uppercase text-ink/70 hover:text-ink/70"
                 >
                   <UserRound className="h-5 w-5" />
                   Account
@@ -140,7 +140,7 @@ export function Header() {
                 <Link
                   href="/cart"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 py-3 text-sm font-bold uppercase text-ink/70 hover:text-electric-blue"
+                  className="flex items-center gap-3 py-3 text-sm font-bold uppercase text-ink/70 hover:text-ink/70"
                 >
                   <ShoppingBag className="h-5 w-5" />
                   Cart ({hydrated ? count : 0})

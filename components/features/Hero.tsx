@@ -19,7 +19,7 @@ export function Hero() {
           >
             <div className="brutal-shadow-room inline-flex w-fit">
               <div className="inline-flex items-center gap-2 border-2 border-ink bg-white px-3 py-2 text-xs font-black uppercase tracking-normal shadow-brutal-blue">
-                <Sparkles className="h-4 w-4 shrink-0 text-electric-blue" />
+                <Sparkles className="h-4 w-4 shrink-0 text-ink" />
                 Limited drop live
               </div>
             </div>
@@ -27,8 +27,8 @@ export function Hero() {
               Wear the room before you enter it.
             </h1>
             <p className="mt-4 max-w-xl text-sm font-semibold leading-7 text-ink/70 sm:mt-5 sm:text-base lg:text-lg">
-              Monochrome essentials, sharp outerwear, and electric-blue details
-              built for high-velocity weekly releases.
+              Monochrome essentials, sharp outerwear, and premium black & white
+              details built for high-velocity weekly releases.
             </p>
             <div className="mt-6 flex w-full flex-col gap-3 sm:mt-8 sm:w-auto sm:flex-row sm:items-end">
               <div className="brutal-shadow-room w-full sm:w-auto">
@@ -58,7 +58,7 @@ export function Hero() {
             className="brutal-shadow-room w-full lg:max-w-none"
           >
             <div className="relative aspect-[4/5] w-full overflow-hidden border-2 border-ink bg-ink shadow-brutal-blue sm:aspect-[5/6] lg:aspect-[4/5]">
-              <div className="absolute left-4 top-4 z-10 border-2 border-ink bg-electric-blue px-3 py-2 text-xs font-black uppercase text-white sm:left-5 sm:top-5">
+              <div className="absolute left-4 top-4 z-10 border-2 border-ink bg-ink px-3 py-2 text-xs font-black uppercase text-white sm:left-5 sm:top-5">
                 48h capsule
               </div>
               <div

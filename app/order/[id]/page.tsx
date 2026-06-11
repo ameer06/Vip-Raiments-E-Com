@@ -22,7 +22,7 @@ export default async function OrderConfirmationPage({ params }: OrderPageProps) 
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <p className="mb-1 text-xs font-black uppercase text-electric-blue sm:mb-2">
+      <p className="mb-1 text-xs font-black uppercase text-ink/50 sm:mb-2">
         Order confirmed
       </p>
       <h1 className="text-3xl font-black uppercase sm:text-4xl lg:text-5xl">

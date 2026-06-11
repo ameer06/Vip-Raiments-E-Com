@@ -28,7 +28,7 @@ export function AdminDashboard() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 border-2 border-ink bg-white p-5 shadow-brutal-blue">
-        <p className="mb-2 text-xs font-black uppercase text-electric-blue">
+        <p className="mb-2 text-xs font-black uppercase text-ink/50">
           Admin dashboard
         </p>
         <h1 className="text-4xl font-black uppercase leading-none tracking-normal sm:text-6xl">
@@ -48,7 +48,7 @@ export function AdminDashboard() {
               key={step.title}
               className="border-2 border-ink bg-white p-4 shadow-brutal"
             >
-              <div className="mb-4 grid h-11 w-11 place-items-center border-2 border-ink bg-electric-blue text-white">
+              <div className="mb-4 grid h-11 w-11 place-items-center border-2 border-ink bg-ink text-white">
                 <Icon className="h-5 w-5" />
               </div>
               <h2 className="text-lg font-black uppercase tracking-normal">

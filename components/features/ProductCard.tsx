@@ -38,7 +38,7 @@ export function ProductCard({ product }: ProductCardProps) {
           className="object-cover opacity-0 grayscale transition duration-500 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0"
         />
         {product.badge ? (
-          <span className="absolute left-2 top-2 border-2 border-ink bg-electric-blue px-1.5 py-0.5 text-[10px] font-black uppercase text-white sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-[11px]">
+          <span className="absolute left-2 top-2 border-2 border-ink bg-ink px-1.5 py-0.5 text-[10px] font-black uppercase text-white sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-[11px]">
             {product.badge}
           </span>
         ) : null}

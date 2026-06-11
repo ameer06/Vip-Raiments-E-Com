@@ -21,7 +21,7 @@ export function Footer() {
         {/* Brand */}
         <div className="flex flex-col gap-4">
           <Link href="/" className="group flex items-center gap-2">
-            <span className="grid h-9 w-9 shrink-0 place-items-center border-2 border-bone bg-electric-blue text-sm font-black text-white shadow-[3px_3px_0_#f4f2ed] transition-transform group-hover:-translate-y-0.5">
+            <span className="grid h-9 w-9 shrink-0 place-items-center border-2 border-bone bg-ink text-sm font-black text-white shadow-[3px_3px_0_#fafafa] transition-transform group-hover:-translate-y-0.5">
               VR
             </span>
             <span className="text-base font-black uppercase tracking-normal">
@@ -45,7 +45,7 @@ export function Footer() {
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm font-semibold text-bone/70 transition-colors hover:text-electric-blue"
+                    className="text-sm font-semibold text-bone/70 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
