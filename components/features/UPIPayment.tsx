@@ -16,6 +16,7 @@ type UPIPaymentProps = {
   isSubmitting: boolean;
   setIsSubmitting: (v: boolean) => void;
   setError: (v: string) => void;
+  validate: () => boolean;
 };
 
 export function UPIPayment({
@@ -23,6 +24,7 @@ export function UPIPayment({
   isSubmitting,
   setIsSubmitting,
   setError,
+  validate,
 }: UPIPaymentProps) {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
@@ -101,6 +103,12 @@ export function UPIPayment({
     setIsSubmitting(true);
     setError("");
     setStep("linking");
+
+    if (!validate()) {
+      setIsSubmitting(false);
+      setStep("idle");
+      return;
+    }
 
     try {
       const res = await fetch("/api/upi/create-payment", {

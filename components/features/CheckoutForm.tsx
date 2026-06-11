@@ -15,6 +15,7 @@ export function CheckoutForm() {
   const { items, subtotal, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     email: "",
     customerName: "",
@@ -23,6 +24,21 @@ export function CheckoutForm() {
     city: "",
     postalCode: ""
   });
+
+  function validateForm(): boolean {
+    const errs: Record<string, string> = {};
+    if (!form.customerName.trim()) errs.customerName = "Name is required";
+    if (!form.email.trim()) errs.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
+      errs.email = "Enter a valid email address";
+    if (form.phone.trim() && !/^\+?\d{10,15}$/.test(form.phone.trim()))
+      errs.phone = "Enter a valid phone number (10-15 digits)";
+    if (!form.addressLine.trim()) errs.addressLine = "Address is required";
+    if (!form.city.trim()) errs.city = "City is required";
+    if (!form.postalCode.trim()) errs.postalCode = "Postal code is required";
+    setFormErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
 
   if (items.length === 0) {
     return (
@@ -40,8 +56,15 @@ export function CheckoutForm() {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setIsSubmitting(true);
     setError("");
+    setFormErrors({});
+
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    setIsSubmitting(true);
 
     if (hasUPI) {
       setIsSubmitting(false);
@@ -80,6 +103,7 @@ export function CheckoutForm() {
           label="Full name"
           value={form.customerName}
           onChange={(v) => setForm({ ...form, customerName: v })}
+          error={formErrors.customerName}
           required
         />
         <CheckoutField
@@ -87,29 +111,34 @@ export function CheckoutForm() {
           type="email"
           value={form.email}
           onChange={(v) => setForm({ ...form, email: v })}
+          error={formErrors.email}
           required
         />
         <CheckoutField
           label="Phone (optional)"
           value={form.phone}
           onChange={(v) => setForm({ ...form, phone: v })}
+          error={formErrors.phone}
         />
         <CheckoutField
           label="Address"
           value={form.addressLine}
           onChange={(v) => setForm({ ...form, addressLine: v })}
+          error={formErrors.addressLine}
           required
         />
         <CheckoutField
           label="City"
           value={form.city}
           onChange={(v) => setForm({ ...form, city: v })}
+          error={formErrors.city}
           required
         />
         <CheckoutField
           label="Postal code"
           value={form.postalCode}
           onChange={(v) => setForm({ ...form, postalCode: v })}
+          error={formErrors.postalCode}
           required
         />
       </div>
@@ -157,6 +186,7 @@ export function CheckoutForm() {
               isSubmitting={isSubmitting}
               setIsSubmitting={setIsSubmitting}
               setError={setError}
+              validate={validateForm}
             />
           </div>
         ) : (
@@ -178,16 +208,18 @@ function CheckoutField({
   value,
   onChange,
   required,
-  type = "text"
+  type = "text",
+  error
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
   type?: string;
+  error?: string;
 }) {
   return (
-    <label className="grid gap-2 text-xs font-black uppercase">
+    <label className="grid gap-1.5 text-xs font-black uppercase">
       {label}
       <input
         type={type}
@@ -196,6 +228,9 @@ function CheckoutField({
         required={required}
         className="h-11 border-2 border-ink bg-bone px-3 text-sm font-bold normal-case outline-none focus-visible:ring-2 focus-visible:ring-electric-blue"
       />
+      {error ? (
+        <p className="text-[10px] font-semibold text-red-600">{error}</p>
+      ) : null}
     </label>
   );
 }
