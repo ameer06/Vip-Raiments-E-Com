@@ -102,3 +102,23 @@ create policy "Users can read their own admin row"
 on public.admin_users for select
 to authenticated
 using (auth.uid() = user_id);
+
+-- Payment intents (UPI gateway-less)
+create table if not exists public.payment_intents (
+  id uuid primary key default gen_random_uuid(),
+  txn_id text not null unique,
+  order_ref text not null,
+  amount integer not null check (amount > 0),
+  status text not null default 'pending' check (status in ('pending', 'confirmed', 'failed')),
+  customer_email text not null,
+  customer_name text not null,
+  customer_phone text,
+  upi_link text,
+  checkout_payload jsonb,
+  provider_ref text,
+  created_at timestamptz not null default now(),
+  confirmed_at timestamptz
+);
+
+create index if not exists payment_intents_status_idx on public.payment_intents (status);
+create index if not exists payment_intents_txn_id_idx on public.payment_intents (txn_id);
