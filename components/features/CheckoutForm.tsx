@@ -220,10 +220,7 @@ function CheckoutField({
 }) {
   return (
     <label className="grid gap-1.5">
-      <span className="label-mono">
-        {label}
-        {required ? "" : " (optional)"}
-      </span>
+      <span className="label-mono">{label}</span>
       <input
         type={type}
         value={value}
