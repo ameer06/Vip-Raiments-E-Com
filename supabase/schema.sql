@@ -122,3 +122,24 @@ create table if not exists public.payment_intents (
 
 create index if not exists payment_intents_status_idx on public.payment_intents (status);
 create index if not exists payment_intents_txn_id_idx on public.payment_intents (txn_id);
+
+alter table public.payment_intents enable row level security;
+
+drop policy if exists "Anyone can insert payment intents" on public.payment_intents;
+create policy "Anyone can insert payment intents"
+on public.payment_intents for insert
+to anon, authenticated
+with check (true);
+
+drop policy if exists "Anyone can read payment intents" on public.payment_intents;
+create policy "Anyone can read payment intents"
+on public.payment_intents for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Anyone can update payment intents" on public.payment_intents;
+create policy "Anyone can update payment intents"
+on public.payment_intents for update
+to anon, authenticated
+using (true)
+with check (true);
