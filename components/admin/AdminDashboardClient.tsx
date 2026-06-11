@@ -1,9 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { LogOut } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatInr } from "@/lib/utils";
+
+const STORAGE_KEY = "vip_admin_overrides";
+
+function loadOverrides(): Record<string, Partial<Product>> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveOverrides(overrides: Record<string, Partial<Product>>) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+}
+
+function applyOverrides(products: Product[], overrides: Record<string, Partial<Product>>): Product[] {
+  return products.map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+}
 
 const emptyProduct = (): Product => ({
   id: `prod_${Date.now()}`,
@@ -32,6 +51,7 @@ export function AdminDashboardClient() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [draft, setDraft] = useState<Product>(emptyProduct());
   const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -44,7 +64,9 @@ export function AdminDashboardClient() {
 
       if (productsRes.ok) {
         const data = await productsRes.json();
-        setProducts(data.products ?? []);
+        const apiProducts = data.products ?? [];
+        const overrides = loadOverrides();
+        setProducts(applyOverrides(apiProducts, overrides));
       }
 
       if (ordersRes.ok) {
@@ -58,8 +80,21 @@ export function AdminDashboardClient() {
     load();
   }, []);
 
+  const persistOverrides = useCallback((updatedProducts: Product[]) => {
+    const overrides: Record<string, Partial<Product>> = {};
+    for (const p of updatedProducts) {
+      const original = products.find((o) => o.id === p.id);
+      if (original && JSON.stringify(p) !== JSON.stringify(original)) {
+        overrides[p.id] = p;
+      }
+    }
+    const existing = loadOverrides();
+    saveOverrides({ ...existing, ...overrides });
+  }, [products]);
+
   async function saveProduct(event: React.FormEvent) {
     event.preventDefault();
+    setIsSaving(true);
     setMessage("");
 
     const payload: Product = {
@@ -75,19 +110,41 @@ export function AdminDashboardClient() {
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      setMessage(data.error ?? "Could not save product.");
+    if (response.ok) {
+      setMessage("Product saved.");
+      setProducts((prev) => {
+        const idx = prev.findIndex((p) => p.id === payload.id);
+        if (idx >= 0) {
+          const next = [...prev];
+          next[idx] = payload;
+          persistOverrides(next);
+          return next;
+        }
+        persistOverrides([...prev, payload]);
+        return [...prev, payload];
+      });
+      setIsSaving(false);
       return;
     }
 
-    setMessage("Product saved.");
-    const list = await fetch("/api/admin/products");
-    if (list.ok) {
-      const refreshed = await list.json();
-      setProducts(refreshed.products ?? []);
+    const data = await response.json();
+    if (data.error?.includes("Service role key")) {
+      setMessage("Saved locally (no Supabase service role). Changes apply in-session.");
+      setProducts((prev) => {
+        const idx = prev.findIndex((p) => p.id === payload.id);
+        if (idx >= 0) {
+          const next = [...prev];
+          next[idx] = payload;
+          persistOverrides(next);
+          return next;
+        }
+        persistOverrides([...prev, payload]);
+        return [...prev, payload];
+      });
+    } else {
+      setMessage(data.error ?? "Could not save product.");
     }
+    setIsSaving(false);
   }
 
   async function handleLogout() {
@@ -137,8 +194,8 @@ export function AdminDashboardClient() {
             <AdminField label="Hover image URL" value={draft.images[1]} onChange={(v) => setDraft({ ...draft, images: [draft.images[0], v] })} />
           </div>
           <div className="mt-5 flex gap-2">
-            <button type="submit" className="h-11 flex-1 rounded-control bg-ink text-sm font-semibold text-white">
-              Save product
+            <button type="submit" disabled={isSaving} className="h-11 flex-1 rounded-control bg-ink text-sm font-semibold text-white disabled:opacity-50">
+              {isSaving ? "Saving..." : "Save product"}
             </button>
             <button
               type="button"
