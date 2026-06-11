@@ -183,7 +183,7 @@ export function UPIPayment({
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`}
                 alt="Scan to pay with UPI"
-                className="h-48 w-48 border-2 border-ink"
+                className="h-48 w-48 rounded-control border border-ink/10"
               />
             </div>
           </div>
@@ -216,7 +216,7 @@ export function UPIPayment({
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`}
                 alt="Scan to pay with UPI"
-                className="h-40 w-40 border-2 border-ink"
+                className="h-40 w-40 rounded-control border border-ink/10"
               />
             </div>
             <a
@@ -231,14 +231,14 @@ export function UPIPayment({
           type="button"
           onClick={handleManualConfirm}
           disabled={isSubmitting}
-          className="h-12 w-full border-2 border-ink bg-emerald-600 text-sm font-black uppercase text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="h-11 w-full rounded-control bg-emerald-600 px-5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
         >
           I&apos;ve completed the payment
         </button>
         <button
           type="button"
           onClick={handleRetry}
-          className="text-center text-xs font-bold text-ink/50 underline"
+          className="text-center text-xs font-medium text-ink/50 underline"
         >
           Cancel and retry
         </button>
@@ -252,11 +252,11 @@ export function UPIPayment({
         type="button"
         onClick={initiatePayment}
         disabled={isSubmitting}
-        className="h-12 w-full border-2 border-ink bg-ink text-sm font-black uppercase text-white hover:bg-ink/90 disabled:opacity-60"
+        className="h-11 w-full rounded-control bg-ink px-5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
       >
         {isSubmitting ? "Preparing…" : `Pay ₹${subtotal} with UPI`}
       </button>
-      <p className="text-center text-[10px] font-semibold text-ink/50 sm:text-xs">
+      <p className="text-center text-xs font-medium text-ink/50">
         Pay via Google Pay, PhonePe, Paytm, or any UPI app
       </p>
     </div>

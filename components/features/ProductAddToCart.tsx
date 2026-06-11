@@ -14,17 +14,17 @@ export function ProductAddToCart({ product }: ProductAddToCartProps) {
   return (
     <div className="mt-6 grid gap-4 sm:mt-8">
       <fieldset>
-        <legend className="mb-2 text-xs font-black uppercase">Size</legend>
+        <legend className="label-mono mb-2">Size</legend>
         <div className="flex flex-wrap gap-2">
           {product.sizes.map((option) => (
             <button
               key={option}
               type="button"
               onClick={() => setSize(option)}
-              className={`min-w-12 border-2 border-ink px-3 py-2 text-sm font-black uppercase ${
+              className={`min-w-12 rounded-control border border-ink/20 px-3 py-2 text-sm font-semibold ${
                 size === option
-                  ? "bg-electric-blue text-white"
-                  : "bg-white hover:bg-bone"
+                  ? "bg-ink text-white"
+                  : "bg-white hover:bg-surface"
               }`}
             >
               {option}

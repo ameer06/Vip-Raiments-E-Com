@@ -16,7 +16,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <motion.article
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 360, damping: 24 }}
-      className="group overflow-hidden border-2 border-ink bg-white shadow-brutal"
+      className="group overflow-hidden rounded-card border border-ink/10 bg-white shadow-card transition-shadow hover:shadow-card-hover"
     >
       <Link
         href={`/products/${product.slug}`}
@@ -27,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
           alt={product.name}
           fill
           sizes="(min-width: 1024px) 25vw, 50vw"
-          className="object-cover grayscale transition duration-500 group-hover:opacity-0"
+          className="object-cover transition duration-500 group-hover:opacity-0"
           priority={product.isPriority}
         />
         <Image
@@ -35,26 +35,26 @@ export function ProductCard({ product }: ProductCardProps) {
           alt=""
           fill
           sizes="(min-width: 1024px) 25vw, 50vw"
-          className="object-cover opacity-0 grayscale transition duration-500 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0"
+          className="object-cover opacity-0 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
         />
         {product.badge ? (
-          <span className="absolute left-2 top-2 border-2 border-ink bg-ink px-1.5 py-0.5 text-[10px] font-black uppercase text-white sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-[11px]">
+          <span className="label-mono absolute left-3 top-3 rounded-control bg-ink px-2 py-1 text-white sm:left-4 sm:top-4 sm:px-3 sm:py-1.5">
             {product.badge}
           </span>
         ) : null}
       </Link>
 
-      <div className="grid gap-2 p-2.5 sm:gap-4 sm:p-4">
-        <div className="flex items-start justify-between gap-1 overflow-hidden sm:gap-2">
+      <div className="grid gap-2 p-card-pad">
+        <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1 overflow-hidden">
-            <h3 className="truncate text-xs font-black uppercase tracking-normal sm:text-sm">
+            <h3 className="truncate text-sm font-semibold">
               <Link href={`/products/${product.slug}`}>{product.name}</Link>
             </h3>
-            <p className="mt-0.5 truncate text-xs font-semibold text-ink/60 sm:mt-1">
+            <p className="mt-0.5 truncate text-sm text-ink/50">
               {product.color}
             </p>
           </div>
-          <p className="shrink-0 whitespace-nowrap text-right text-xs font-black sm:text-sm">
+          <p className="shrink-0 whitespace-nowrap text-right text-sm font-semibold">
             {formatInr(product.price)}
           </p>
         </div>
@@ -63,7 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
           product={product}
           label="Quick add"
           fullWidth
-          className="h-8 bg-bone px-2 text-[10px] shadow-none hover:bg-electric-blue hover:text-white sm:h-10 sm:px-3 sm:text-xs"
+          className="h-9 rounded-control bg-surface px-3 text-xs font-semibold transition-colors hover:bg-ink hover:text-white"
         />
       </div>
     </motion.article>

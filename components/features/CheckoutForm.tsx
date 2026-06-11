@@ -42,11 +42,11 @@ export function CheckoutForm() {
 
   if (items.length === 0) {
     return (
-      <div className="border-2 border-ink bg-white p-6 text-center shadow-brutal sm:p-8">
-        <p className="font-black uppercase">Nothing to checkout</p>
+      <div className="rounded-card border border-ink/10 bg-white p-6 text-center shadow-card sm:p-8">
+        <p className="text-lg font-semibold">Nothing to checkout</p>
         <Link
           href="/cart"
-          className="mt-4 inline-flex h-11 items-center justify-center border-2 border-ink bg-ink px-5 text-sm font-black uppercase text-white sm:mt-5"
+          className="mt-4 inline-flex h-11 items-center justify-center rounded-control bg-ink px-5 text-sm font-semibold text-white sm:mt-5"
         >
           Return to cart
         </Link>
@@ -97,8 +97,8 @@ export function CheckoutForm() {
       onSubmit={handleSubmit}
       className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]"
     >
-      <div className="grid gap-4 border-2 border-ink bg-white p-4 shadow-brutal sm:p-5">
-        <h2 className="text-xl font-black uppercase sm:text-2xl">Shipping</h2>
+      <div className="grid gap-4 rounded-card border border-ink/10 bg-white p-card-pad shadow-card sm:p-card-pad">
+        <h2 className="text-xl font-semibold sm:text-2xl">Shipping</h2>
         <CheckoutField
           label="Full name"
           value={form.customerName}
@@ -143,26 +143,26 @@ export function CheckoutForm() {
         />
       </div>
 
-      <aside className="h-fit border-2 border-ink bg-white p-4 shadow-brutal-blue sm:p-5 lg:sticky lg:top-24">
-        <h2 className="text-xl font-black uppercase sm:text-2xl">
+      <aside className="h-fit rounded-card border border-ink/10 bg-white p-card-pad shadow-card lg:sticky lg:top-24">
+        <h2 className="text-xl font-semibold sm:text-2xl">
           {hasUPI ? "Pay with UPI" : "Payment (mock)"}
         </h2>
         {hasUPI ? (
-          <p className="mt-3 text-sm font-semibold text-ink/65">
+          <p className="mt-3 text-sm text-ink/50">
             Pay via Google Pay, PhonePe, Paytm, or any UPI app. No card details needed.
           </p>
         ) : (
-          <p className="mt-3 text-sm font-semibold text-ink/65">
+          <p className="mt-3 text-sm text-ink/50">
             No real charge. Click pay to simulate a successful payment and create
             an order in Supabase. Set{" "}
-            <code className="bg-bone px-1">NEXT_PUBLIC_MERCHANT_UPI_ID</code> to enable UPI payments.
+            <code className="bg-surface px-1">NEXT_PUBLIC_MERCHANT_UPI_ID</code> to enable UPI payments.
           </p>
         )}
         <div className="mt-5 flex items-center justify-between gap-4 sm:mt-6">
-          <p className="text-sm font-bold">Total</p>
-          <p className="text-xl font-black sm:text-2xl">{formatInr(subtotal)}</p>
+          <p className="text-sm font-medium">Total</p>
+          <p className="text-xl font-semibold sm:text-2xl">{formatInr(subtotal)}</p>
         </div>
-        <ul className="mt-4 grid gap-2 text-xs font-semibold text-ink/60">
+        <ul className="mt-4 grid gap-2 text-xs text-ink/50">
           {items.map((item) => (
             <li
               key={item.lineId}
@@ -175,7 +175,7 @@ export function CheckoutForm() {
           ))}
         </ul>
         {error ? (
-          <p className="mt-4 border-2 border-ink bg-bone p-3 text-sm font-bold text-ink/75">
+          <p className="mt-4 rounded-control border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">
             {error}
           </p>
         ) : null}
@@ -193,7 +193,7 @@ export function CheckoutForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-5 inline-flex h-12 w-full items-center justify-center border-2 border-ink bg-ink text-sm font-black uppercase text-white disabled:opacity-60 sm:mt-6"
+            className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-control bg-ink text-sm font-semibold text-white disabled:opacity-60 sm:mt-6"
           >
             {isSubmitting ? "Processing…" : "Pay with mock gateway"}
           </button>
@@ -219,17 +219,20 @@ function CheckoutField({
   error?: string;
 }) {
   return (
-    <label className="grid gap-1.5 text-xs font-black uppercase">
-      {label}
+    <label className="grid gap-1.5">
+      <span className="label-mono">
+        {label}
+        {required ? "" : " (optional)"}
+      </span>
       <input
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         required={required}
-        className="h-11 border-2 border-ink bg-bone px-3 text-sm font-bold normal-case outline-none focus-visible:ring-2 focus-visible:ring-electric-blue"
+        className="h-11 rounded-control border border-ink/20 bg-white px-3 text-sm font-normal text-ink outline-none transition-colors focus:border-ink"
       />
       {error ? (
-        <p className="text-[10px] font-semibold text-red-600">{error}</p>
+        <p className="text-xs text-red-600">{error}</p>
       ) : null}
     </label>
   );

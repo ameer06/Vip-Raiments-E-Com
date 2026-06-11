@@ -4,8 +4,8 @@
 
 :root {
   color-scheme: light;
-  --background: #fafafa;
-  --foreground: #000000;
+  --background: #ffffff;
+  --foreground: #111827;
 }
 
 * {
@@ -25,29 +25,19 @@ body {
 }
 
 ::selection {
-  background: #000000;
+  background: #111827;
   color: white;
 }
 
 @layer base {
   a,
   button {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-bone;
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
 }
 
 @layer components {
-  .brutal-border {
-    @apply border-2 border-ink shadow-brutal;
-  }
-
-  .brutal-border-blue {
-    @apply border-2 border-ink shadow-brutal-blue;
-  }
-
-  /* Reserve space so offset brutal shadows are not clipped */
-  .brutal-shadow-room {
-    padding-right: 5px;
-    padding-bottom: 5px;
+  .label-mono {
+    @apply font-mono text-xs font-semibold uppercase tracking-wider;
   }
 }

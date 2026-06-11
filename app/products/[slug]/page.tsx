@@ -42,14 +42,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {product.images.map((image, index) => (
           <div
             key={image}
-            className="relative aspect-[4/5] overflow-hidden border-2 border-ink bg-ink shadow-brutal"
+            className="relative aspect-[4/5] overflow-hidden rounded-card bg-ink shadow-card"
           >
             <Image
               src={image}
               alt={index === 0 ? product.name : ""}
               fill
               sizes="(min-width: 1024px) 33vw, 50vw"
-              className="object-cover grayscale"
+              className="object-cover"
               priority={index === 0}
             />
           </div>
@@ -59,20 +59,20 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="lg:sticky lg:top-24 lg:self-start">
         <Link
           href="/products"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-black uppercase text-ink/70 hover:text-ink sm:mb-6"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-ink/60 hover:text-ink sm:mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to drops
         </Link>
-        <p className="mb-2 text-xs font-black uppercase text-ink/50 sm:mb-3">
+        <p className="label-mono mb-2 text-ink/50 sm:mb-3">
           {product.badge ?? "Limited"}
         </p>
-        <h1 className="text-3xl font-black uppercase leading-none tracking-normal sm:text-5xl lg:text-6xl">
+        <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
           {product.name}
         </h1>
-        <p className="mt-3 text-base font-bold text-ink/64 sm:mt-4 sm:text-lg">{product.color}</p>
-        <p className="mt-4 text-xl font-black sm:mt-6 sm:text-2xl">{formatInr(product.price)}</p>
-        <div className="mt-4 grid gap-2 text-xs font-bold text-ink/70 sm:mt-6 sm:text-sm">
+        <p className="mt-3 text-base text-ink/60 sm:mt-4 sm:text-lg">{product.color}</p>
+        <p className="mt-4 text-xl font-semibold sm:mt-6 sm:text-2xl">{formatInr(product.price)}</p>
+        <div className="mt-4 grid gap-2 text-sm text-ink/60 sm:mt-6">
           <p>Available sizes: {product.sizes.join(", ")}</p>
           <p>Inventory: {product.stock} units</p>
         </div>

@@ -104,12 +104,12 @@ export function AdminDashboardClient() {
     <>
       <div className="mb-6 flex items-center justify-between">
         {message ? (
-          <p className="border-2 border-ink bg-bone p-3 text-sm font-bold">{message}</p>
+          <p className="rounded-control border border-ink/10 bg-surface p-3 text-sm text-ink/60">{message}</p>
         ) : null}
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="ml-auto flex items-center gap-2 h-11 border-2 border-ink bg-ink px-4 text-sm font-black uppercase text-white hover:bg-ink/90 disabled:opacity-50"
+          className="ml-auto flex items-center gap-2 h-11 rounded-control bg-ink px-4 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
         >
           <LogOut className="h-4 w-4" />
           {loggingOut ? "Logging out..." : "Logout"}
@@ -119,9 +119,9 @@ export function AdminDashboardClient() {
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <form
           onSubmit={saveProduct}
-          className="border-2 border-ink bg-white p-5 shadow-brutal"
+          className="rounded-card border border-ink/10 bg-white p-card-pad shadow-card"
         >
-          <h2 className="text-2xl font-black uppercase tracking-normal">
+          <h2 className="text-xl font-semibold">
             Product editor
           </h2>
           <div className="mt-5 grid gap-4">
@@ -137,50 +137,50 @@ export function AdminDashboardClient() {
             <AdminField label="Hover image URL" value={draft.images[1]} onChange={(v) => setDraft({ ...draft, images: [draft.images[0], v] })} />
           </div>
           <div className="mt-5 flex gap-2">
-            <button type="submit" className="h-11 flex-1 border-2 border-ink bg-ink text-sm font-black uppercase text-white">
+            <button type="submit" className="h-11 flex-1 rounded-control bg-ink text-sm font-semibold text-white">
               Save product
             </button>
             <button
               type="button"
               onClick={() => setDraft(emptyProduct())}
-              className="h-11 border-2 border-ink px-4 text-sm font-black uppercase"
+              className="h-11 rounded-control border border-ink/20 px-4 text-sm font-semibold"
             >
               New
             </button>
           </div>
         </form>
 
-        <div className="overflow-hidden border-2 border-ink bg-white shadow-brutal">
-          <div className="border-b-2 border-ink p-5">
-            <h2 className="text-2xl font-black uppercase tracking-normal">
+        <div className="overflow-hidden rounded-card border border-ink/10 bg-white shadow-card">
+          <div className="border-b border-ink/10 p-card-pad">
+            <h2 className="text-xl font-semibold">
               Inventory
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[680px] text-left text-sm">
-              <thead className="bg-bone text-xs font-black uppercase">
+              <thead className="bg-surface text-xs font-semibold uppercase tracking-wider">
                 <tr>
-                  <th className="border-b-2 border-ink p-4">Product</th>
-                  <th className="border-b-2 border-ink p-4">Price</th>
-                  <th className="border-b-2 border-ink p-4">Stock</th>
-                  <th className="border-b-2 border-ink p-4">Status</th>
+                  <th className="border-b border-ink/10 p-4">Product</th>
+                  <th className="border-b border-ink/10 p-4">Price</th>
+                  <th className="border-b border-ink/10 p-4">Stock</th>
+                  <th className="border-b border-ink/10 p-4">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
                   <tr
                     key={product.id}
-                    className={`cursor-pointer font-bold transition-colors ${
+                    className={`cursor-pointer transition-colors ${
                       draft.id === product.id
-                        ? "bg-electric-blue/20 border-l-4 border-electric-blue"
-                        : "hover:bg-bone/60"
+                        ? "bg-ink/5"
+                        : "hover:bg-surface"
                     }`}
                     onClick={() => setDraft(product)}
                   >
-                    <td className="border-b border-ink/15 p-4">{product.name}</td>
-                    <td className="border-b border-ink/15 p-4">{formatInr(product.price)}</td>
-                    <td className="border-b border-ink/15 p-4">{product.stock}</td>
-                    <td className="border-b border-ink/15 p-4 uppercase">{product.status}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm font-medium">{product.name}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm">{formatInr(product.price)}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm">{product.stock}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm">{product.status}</td>
                   </tr>
                 ))}
               </tbody>
@@ -189,41 +189,41 @@ export function AdminDashboardClient() {
         </div>
       </div>
 
-      <div className="mt-10 overflow-hidden border-2 border-ink bg-white shadow-brutal">
-        <div className="border-b-2 border-ink p-5">
-          <h2 className="text-2xl font-black uppercase tracking-normal">Recent orders</h2>
+      <div className="mt-section overflow-hidden rounded-card border border-ink/10 bg-white shadow-card">
+        <div className="border-b border-ink/10 p-card-pad">
+          <h2 className="text-xl font-semibold">Recent orders</h2>
         </div>
         {orders.length === 0 ? (
-          <p className="p-5 text-sm font-semibold text-ink/65">
+          <p className="p-card-pad text-sm text-ink/50">
             No orders yet. Complete a mock checkout to create one (requires Supabase tables).
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="bg-bone text-xs font-black uppercase">
+              <thead className="bg-surface text-xs font-semibold uppercase tracking-wider">
                 <tr>
-                  <th className="border-b-2 border-ink p-4">Order</th>
-                  <th className="border-b-2 border-ink p-4">Customer</th>
-                  <th className="border-b-2 border-ink p-4">Total</th>
-                  <th className="border-b-2 border-ink p-4">Status</th>
+                  <th className="border-b border-ink/10 p-4">Order</th>
+                  <th className="border-b border-ink/10 p-4">Customer</th>
+                  <th className="border-b border-ink/10 p-4">Total</th>
+                  <th className="border-b border-ink/10 p-4">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.id} className="font-bold">
-                    <td className="border-b border-ink/15 p-4 font-mono text-xs">
+                  <tr key={order.id} className="font-medium">
+                    <td className="border-b border-ink/10 p-4 font-mono text-xs">
                       {order.id.slice(0, 8)}…
                     </td>
-                    <td className="border-b border-ink/15 p-4">
+                    <td className="border-b border-ink/10 p-4">
                       {order.customer_name}
-                      <span className="block text-xs font-semibold text-ink/55">
+                      <span className="block text-xs text-ink/50">
                         {order.email}
                       </span>
                     </td>
-                    <td className="border-b border-ink/15 p-4">
+                    <td className="border-b border-ink/10 p-4">
                       {formatInr(order.total_inr)}
                     </td>
-                    <td className="border-b border-ink/15 p-4 uppercase">
+                    <td className="border-b border-ink/10 p-4">
                       {order.status}
                     </td>
                   </tr>
@@ -247,13 +247,13 @@ function AdminField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-xs font-black uppercase">
-      {label}
+    <label className="grid gap-1.5">
+      <span className="label-mono">{label}</span>
       <input
         type="text"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 border-2 border-ink bg-bone px-3 text-sm font-bold normal-case outline-none focus-visible:ring-2 focus-visible:ring-electric-blue"
+        className="h-11 rounded-control border border-ink/20 bg-white px-3 text-sm font-normal text-ink outline-none transition-colors focus:border-ink"
       />
     </label>
   );
