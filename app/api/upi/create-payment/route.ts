@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const upiId = process.env.MERCHANT_UPI_ID;
+    const upiId = process.env.NEXT_PUBLIC_MERCHANT_UPI_ID || process.env.MERCHANT_UPI_ID;
     if (!upiId) {
       return Response.json(
         { ok: false, error: "UPI payments not configured" },
