@@ -29,6 +29,7 @@ export function UPIPayment({
   const [step, setStep] = useState<"idle" | "linking" | "paid" | "confirming">("idle");
   const [upiLink, setUpiLink] = useState<string | null>(null);
   const [txnId, setTxnId] = useState<string | null>(null);
+  const [showQr, setShowQr] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stopPolling = useCallback(() => {
@@ -132,6 +133,7 @@ export function UPIPayment({
 
       window.location.href = data.upiLink;
       startPolling(data.txnId);
+      setTimeout(() => setShowQr(true), 3000);
     } catch {
       setError("Failed to connect. Please try again.");
       setStep("idle");
@@ -148,6 +150,7 @@ export function UPIPayment({
     setStep("idle");
     setUpiLink(null);
     setTxnId(null);
+    setShowQr(false);
     setIsSubmitting(false);
   }
 
@@ -162,6 +165,21 @@ export function UPIPayment({
             ? "Opening your UPI app…"
             : "Confirming payment…"}
         </p>
+        {step === "linking" && showQr && upiLink && (
+          <div className="grid gap-3">
+            <p className="text-center text-xs font-semibold text-ink/60">
+              Or scan with your phone
+            </p>
+            <div className="flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`}
+                alt="Scan to pay with UPI"
+                className="h-48 w-48 border-2 border-ink"
+              />
+            </div>
+          </div>
+        )}
         {upiLink && (
           <a
             href={upiLink}
@@ -180,6 +198,27 @@ export function UPIPayment({
         <p className="text-center text-sm font-bold">
           Payment sent? Complete your order below.
         </p>
+        {upiLink && (
+          <div className="grid gap-2">
+            <p className="text-center text-xs font-semibold text-ink/60">
+              Scan to pay if you haven&apos;t yet
+            </p>
+            <div className="flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`}
+                alt="Scan to pay with UPI"
+                className="h-40 w-40 border-2 border-ink"
+              />
+            </div>
+            <a
+              href={upiLink}
+              className="text-center text-xs font-semibold text-electric-blue underline"
+            >
+              Open UPI app again
+            </a>
+          </div>
+        )}
         <button
           type="button"
           onClick={handleManualConfirm}
@@ -188,14 +227,6 @@ export function UPIPayment({
         >
           I&apos;ve completed the payment
         </button>
-        {upiLink && (
-          <a
-            href={upiLink}
-            className="text-center text-xs font-semibold text-electric-blue underline"
-          >
-            Open UPI app again
-          </a>
-        )}
         <button
           type="button"
           onClick={handleRetry}
