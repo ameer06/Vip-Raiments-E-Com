@@ -25,7 +25,7 @@ export default async function ProductsPage({
 
   return (
     <ProductGrid
-      eyebrow="Collection"
+      eyebrow={filter ?? "all drops"}
       title={title}
       products={products}
       className="pt-8 sm:pt-12"
