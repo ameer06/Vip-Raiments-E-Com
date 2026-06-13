@@ -2,6 +2,10 @@ import { Hero } from "@/components/features/Hero";
 import { ProductGrid } from "@/components/features/ProductGrid";
 import { getActiveProducts } from "@/lib/products/get-products";
 
+export const metadata = {
+  title: "VIP Raiments | Premium Streetwear Drops"
+};
+
 export default async function HomePage() {
   const products = await getActiveProducts();
 
