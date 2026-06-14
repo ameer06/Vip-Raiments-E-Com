@@ -21,7 +21,7 @@ export function ProductGrid({
         <p className="label-mono mb-1 text-ink/50 sm:mb-2">
           {eyebrow}
         </p>
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-5xl">
+        <h2 className="text-2xl font-bold leading-tight tracking-tight sm:text-3xl lg:text-5xl">
           {title}
         </h2>
       </div>
