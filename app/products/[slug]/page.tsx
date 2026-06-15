@@ -6,6 +6,8 @@ import { ProductAddToCart } from "@/components/features/ProductAddToCart";
 import { getActiveProducts, getProductBySlug } from "@/lib/products/get-products";
 import { formatInr } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 type ProductPageProps = {
   params: Promise<{
     slug: string;

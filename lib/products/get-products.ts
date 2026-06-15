@@ -3,6 +3,7 @@ import { mapProductRow, mapProductToRow, type ProductRow } from "@/lib/products/
 import { createSupabaseAdminClient, hasSupabaseServiceRole } from "@/lib/supabase/admin";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { hasSupabaseEnv } from "@/lib/supabase/server";
+import { applyOverrides } from "@/lib/overrides";
 
 function getStaticActiveProducts() {
   return featuredProducts.filter((product) => product.status === "active");
@@ -37,21 +38,21 @@ async function fetchFromSupabase(activeOnly: boolean) {
 
 export async function getActiveProducts(): Promise<Product[]> {
   if (!hasSupabaseEnv()) {
-    return getStaticActiveProducts();
+    return applyOverrides(getStaticActiveProducts());
   }
 
   const products = await fetchFromSupabase(true);
-  return products ?? getStaticActiveProducts();
+  return applyOverrides(products ?? getStaticActiveProducts());
 }
 
 export async function getAllProducts(): Promise<Product[]> {
   if (!hasSupabaseEnv()) {
-    return getStaticAllProducts();
+    return applyOverrides(getStaticAllProducts());
   }
 
   const supabase = createSupabasePublicClient();
   if (!supabase) {
-    return getStaticAllProducts();
+    return applyOverrides(getStaticAllProducts());
   }
 
   const { data, error } = await supabase
@@ -60,10 +61,10 @@ export async function getAllProducts(): Promise<Product[]> {
     .order("created_at", { ascending: false });
 
   if (error || !data?.length) {
-    return getStaticAllProducts();
+    return applyOverrides(getStaticAllProducts());
   }
 
-  return (data as ProductRow[]).map(mapProductRow);
+  return applyOverrides((data as ProductRow[]).map(mapProductRow));
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
@@ -73,7 +74,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 export async function getAllProductsAdmin(): Promise<Product[]> {
   if (!hasSupabaseServiceRole()) {
-    return getStaticAllProducts();
+    return applyOverrides(getStaticAllProducts());
   }
 
   const supabase = createSupabaseAdminClient();
@@ -83,10 +84,10 @@ export async function getAllProductsAdmin(): Promise<Product[]> {
     .order("created_at", { ascending: false });
 
   if (error || !data?.length) {
-    return getStaticAllProducts();
+    return applyOverrides(getStaticAllProducts());
   }
 
-  return (data as ProductRow[]).map(mapProductRow);
+  return applyOverrides((data as ProductRow[]).map(mapProductRow));
 }
 
 export async function upsertProduct(product: Product) {

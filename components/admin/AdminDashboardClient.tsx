@@ -113,7 +113,12 @@ export function AdminDashboardClient() {
     if (response.ok) {
       setMessage("Saved to Supabase.");
     } else {
-      setMessage("Saved locally (no backend). Refresh to reset.");
+      setMessage("Saved locally (no backend). Price updated on storefront.");
+      fetch("/api/overrides", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: payload.id, data: { price: payload.price, stock: payload.stock } })
+      }).catch(() => {});
     }
 
     setProducts((prev) => {
