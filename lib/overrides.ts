@@ -1,15 +1,17 @@
+import { cookies } from "next/headers";
 import type { Product } from "@/data/products";
 
-const store = new Map<string, Partial<Product>>();
-
-export function setOverride(id: string, data: Partial<Product>) {
-  store.set(id, data);
-}
-
-export function applyOverrides<T extends Product>(products: T[]): T[] {
-  if (store.size === 0) return products;
-  return products.map((p) => {
-    const override = store.get(p.id);
-    return override ? { ...p, ...override } : p;
-  });
+export async function applyOverrides<T extends Product>(products: T[]): Promise<T[]> {
+  try {
+    const store = await cookies();
+    const raw = store.get("admin_overrides")?.value;
+    if (!raw) return products;
+    const overrides = JSON.parse(raw) as Record<string, Partial<Product>>;
+    return products.map((p) => {
+      const override = overrides[p.id];
+      return override ? { ...p, ...override } : p;
+    });
+  } catch {
+    return products;
+  }
 }
