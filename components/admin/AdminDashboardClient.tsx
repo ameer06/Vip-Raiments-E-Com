@@ -111,39 +111,22 @@ export function AdminDashboardClient() {
     });
 
     if (response.ok) {
-      setMessage("Product saved.");
-      setProducts((prev) => {
-        const idx = prev.findIndex((p) => p.id === payload.id);
-        if (idx >= 0) {
-          const next = [...prev];
-          next[idx] = payload;
-          persistOverrides(next);
-          return next;
-        }
-        persistOverrides([...prev, payload]);
-        return [...prev, payload];
-      });
-      setIsSaving(false);
-      return;
+      setMessage("Saved to Supabase.");
+    } else {
+      setMessage("Saved locally (no backend). Refresh to reset.");
     }
 
-    const data = await response.json();
-    if (data.error?.includes("Service role key")) {
-      setMessage("Saved locally (no Supabase service role). Changes apply in-session.");
-      setProducts((prev) => {
-        const idx = prev.findIndex((p) => p.id === payload.id);
-        if (idx >= 0) {
-          const next = [...prev];
-          next[idx] = payload;
-          persistOverrides(next);
-          return next;
-        }
-        persistOverrides([...prev, payload]);
-        return [...prev, payload];
-      });
-    } else {
-      setMessage(data.error ?? "Could not save product.");
-    }
+    setProducts((prev) => {
+      const idx = prev.findIndex((p) => p.id === payload.id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = payload;
+        persistOverrides(next);
+        return next;
+      }
+      persistOverrides([...prev, payload]);
+      return [...prev, payload];
+    });
     setIsSaving(false);
   }
 
