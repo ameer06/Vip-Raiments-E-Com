@@ -186,8 +186,8 @@ export function AdminDashboardClient() {
             <AdminField label="Product name" value={draft.name} onChange={(v) => setDraft({ ...draft, name: v })} />
             <AdminField label="Slug" value={draft.slug} onChange={(v) => setDraft({ ...draft, slug: v })} />
             <AdminField label="Color" value={draft.color} onChange={(v) => setDraft({ ...draft, color: v })} />
-            <AdminField label="Price (INR)" value={String(draft.price)} onChange={(v) => setDraft({ ...draft, price: Number(v) || 0 })} />
-            <AdminField label="Stock" value={String(draft.stock)} onChange={(v) => setDraft({ ...draft, stock: Number(v) || 0 })} />
+            <AdminField label="Price (INR)" type="number" value={String(draft.price)} onChange={(v) => setDraft((prev) => ({ ...prev, price: Number(v) || 0 }))} />
+            <AdminField label="Stock" type="number" value={String(draft.stock)} onChange={(v) => setDraft((prev) => ({ ...prev, stock: Number(v) || 0 }))} />
             <AdminField label="Sizes (comma-separated)" value={draft.sizes.join(", ")} onChange={(v) => setDraft({ ...draft, sizes: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
             <AdminField label="Status" value={draft.status} onChange={(v) => setDraft({ ...draft, status: v as Product["status"] })} />
             <AdminField label="Front image URL" value={draft.images[0]} onChange={(v) => setDraft({ ...draft, images: [v, draft.images[1]] })} />
@@ -297,17 +297,19 @@ export function AdminDashboardClient() {
 function AdminField({
   label,
   value,
-  onChange
+  onChange,
+  type = "text"
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  type?: string;
 }) {
   return (
     <label className="grid gap-1.5">
       <span className="label-mono">{label}</span>
       <input
-        type="text"
+        type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="h-11 rounded-control border border-ink/20 bg-white px-3 text-sm font-normal text-ink outline-none transition-colors focus:border-ink"
