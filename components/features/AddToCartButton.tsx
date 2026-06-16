@@ -40,7 +40,7 @@ export function AddToCartButton({
         })
       }
       className={cn(
-        "inline-flex h-11 items-center justify-center gap-2 rounded-control bg-ink px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex h-11 items-center justify-center gap-2 rounded-control bg-stone-800 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50",
         fullWidth && "w-full",
         className
       )}

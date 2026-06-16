@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import type { Product } from "@/data/products";
 import { AddToCartButton } from "@/components/features/AddToCartButton";
 import { formatInr } from "@/lib/utils";
@@ -13,11 +12,7 @@ type ProductCardProps = {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <motion.article
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 360, damping: 24 }}
-      className="group overflow-hidden rounded-card border border-ink/10 bg-white shadow-card transition-shadow hover:shadow-card-hover"
-    >
+    <article className="group overflow-hidden rounded-card border border-ink/10 bg-white shadow-card hover:shadow-card-hover">
       <Link
         href={`/products/${product.slug}`}
         className="relative block aspect-[4/5] overflow-hidden bg-ink"
@@ -63,9 +58,9 @@ export function ProductCard({ product }: ProductCardProps) {
           product={product}
           label="Quick add"
           fullWidth
-          className="h-9 rounded-control bg-surface px-3 text-xs font-semibold transition-colors hover:bg-ink hover:text-white"
+          className="h-9 rounded-control bg-stone-800 px-3 text-xs font-semibold text-white"
         />
       </div>
-    </motion.article>
+    </article>
   );
 }
