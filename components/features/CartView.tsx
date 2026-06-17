@@ -20,7 +20,7 @@ export function CartView() {
           href="/products"
           className="mt-5 inline-flex h-11 items-center justify-center rounded-control bg-ink px-5 text-sm font-semibold text-white sm:mt-6"
         >
-          Browse drops
+          Browse shits
         </Link>
       </div>
     );

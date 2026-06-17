@@ -32,7 +32,7 @@ export const featuredProducts: Product[] = [
     sizes: ["S", "M", "L", "XL"],
     status: "active",
     badge: "New",
-    category: "outerwear",
+    category: "t-shits",
     isPriority: true,
     images: [
       "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
@@ -49,7 +49,7 @@ export const featuredProducts: Product[] = [
     sizes: ["S", "M", "L", "XL"],
     status: "active",
     badge: "Low stock",
-    category: "outerwear",
+    category: "t-shits",
     images: [
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=900&q=80"
@@ -64,7 +64,7 @@ export const featuredProducts: Product[] = [
     stock: 22,
     sizes: ["28", "30", "32", "34", "36"],
     status: "active",
-    category: "essentials",
+    category: "pants",
     images: [
       "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=900&q=80"
@@ -80,7 +80,7 @@ export const featuredProducts: Product[] = [
     sizes: ["XS", "S", "M", "L", "XL"],
     status: "active",
     badge: "Drop",
-    category: "essentials",
+    category: "pants",
     images: [
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80"

@@ -2,9 +2,9 @@ import Link from "next/link";
 
 const footerLinks = {
   Shop: [
-    { href: "/products", label: "All Drops" },
-    { href: "/products?filter=outerwear", label: "Outerwear" },
-    { href: "/products?filter=essentials", label: "Essentials" },
+    { href: "/products", label: "All Shits" },
+    { href: "/products?filter=t-shits", label: "T-shits" },
+    { href: "/products?filter=pants", label: "Pants" },
   ],
   Help: [
     { href: "/cart", label: "Your Cart" },
@@ -28,7 +28,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="max-w-xs text-sm leading-relaxed text-white/50">
-            Premium streetwear drops built for first‑look buyers. Limited runs,
+            Premium streetwear shits built for first‑look buyers. Limited runs,
             no restocks.
           </p>
         </div>

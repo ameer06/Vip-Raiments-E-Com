@@ -8,9 +8,9 @@ import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/products", label: "Drops" },
-  { href: "/products?filter=outerwear", label: "Outerwear" },
-  { href: "/products?filter=essentials", label: "Essentials" }
+  { href: "/products", label: "Shits" },
+  { href: "/products?filter=t-shits", label: "T-shits" },
+  { href: "/products?filter=pants", label: "Pants" }
 ];
 
 export function Header() {
