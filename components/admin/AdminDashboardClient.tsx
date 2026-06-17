@@ -84,7 +84,7 @@ export function AdminDashboardClient() {
     const overrides: Record<string, Partial<Product>> = {};
     for (const p of updatedProducts) {
       const original = products.find((o) => o.id === p.id);
-      if (original && JSON.stringify(p) !== JSON.stringify(original)) {
+      if (!original || JSON.stringify(p) !== JSON.stringify(original)) {
         overrides[p.id] = p;
       }
     }
@@ -117,7 +117,7 @@ export function AdminDashboardClient() {
       fetch("/api/overrides", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: payload.id, data: { price: payload.price, stock: payload.stock, images: payload.images } })
+        body: JSON.stringify({ id: payload.id, data: payload })
       }).catch(() => {});
     }
 
