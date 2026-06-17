@@ -39,7 +39,8 @@ export async function applyOverrides<T extends Product>(products: T[]): Promise<
     }
 
     return result;
-  } catch {
+  } catch (error) {
+    console.error("Failed to apply overrides from cookie:", error);
     return products;
   }
 }

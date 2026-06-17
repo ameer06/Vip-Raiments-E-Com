@@ -1,13 +1,18 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { createSupabaseAdminClient, hasSupabaseServiceRole } from "@/lib/supabase/admin";
-import { writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
 
 export async function POST(request: Request) {
   try {
     const adminCheck = await requireAdmin();
     if (!adminCheck.ok) {
       return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!hasSupabaseServiceRole()) {
+      return Response.json(
+        { ok: false, error: "SUPABASE_SERVICE_ROLE_KEY not set. Images must be uploaded to Supabase Storage." },
+        { status: 400 }
+      );
     }
 
     const formData = await request.formData();
@@ -29,69 +34,44 @@ export async function POST(request: Request) {
     const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
     const filename = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-    // Try Supabase Storage first (works on Vercel)
-    if (hasSupabaseServiceRole()) {
-      const supabase = createSupabaseAdminClient();
+    const supabase = createSupabaseAdminClient();
 
-      // Ensure bucket exists
-      const { data: buckets } = await supabase.storage.listBuckets();
-      if (!buckets?.find((b) => b.name === "product-images")) {
-        await supabase.storage.createBucket("product-images", {
-          public: true
-        });
-      }
-
-      const { data, error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(filename, file, { cacheControl: "3600", upsert: false });
-
-      if (!uploadError && data) {
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const publicUrl = `${supabaseUrl}/storage/v1/object/public/product-images/${data.path}`;
-        return Response.json({
-          ok: true,
-          url: publicUrl,
-          filename: data.path,
-          size: file.size
-        });
-      }
-
-      // If upload failed (e.g. bucket not public), try upsert instead
-      if (uploadError) {
-        const { data: retryData, error: retryError } = await supabase.storage
-          .from("product-images")
-          .upload(filename, file, { cacheControl: "3600", upsert: true });
-
-        if (!retryError && retryData) {
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          const publicUrl = `${supabaseUrl}/storage/v1/object/public/product-images/${retryData.path}`;
-          return Response.json({
-            ok: true,
-            url: publicUrl,
-            filename: retryData.path,
-            size: file.size
-          });
-        }
+    // Ensure bucket exists (public)
+    const { data: buckets } = await supabase.storage.listBuckets();
+    if (!buckets?.find((b) => b.name === "product-images")) {
+      const { error: createError } = await supabase.storage.createBucket("product-images", {
+        public: true
+      });
+      if (createError) {
+        return Response.json(
+          { ok: false, error: `Failed to create bucket: ${createError.message}` },
+          { status: 500 }
+        );
       }
     }
 
-    // Local fallback for development
-    try {
-      const dir = path.join(process.cwd(), "public", "images");
-      await mkdir(dir, { recursive: true });
-      await writeFile(path.join(dir, filename), Buffer.from(await file.arrayBuffer()));
-      return Response.json({
-        ok: true,
-        url: `/images/${filename}`,
-        filename,
-        size: file.size
-      });
-    } catch {
+    // Upload with upsert (overwrites if same filename, handles concurrent uploads)
+    const { data, error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(filename, file, { cacheControl: "3600", upsert: true });
+
+    if (uploadError || !data) {
       return Response.json(
-        { ok: false, error: "Upload failed. Make sure the 'product-images' bucket exists in Supabase Storage." },
+        { ok: false, error: `Supabase Storage upload failed: ${uploadError?.message ?? "Unknown error"}` },
         { status: 500 }
       );
     }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(data.path);
+
+    return Response.json({
+      ok: true,
+      url: publicUrl,
+      filename: data.path,
+      size: file.size
+    });
   } catch (error) {
     console.error("Upload error:", error);
     return Response.json(

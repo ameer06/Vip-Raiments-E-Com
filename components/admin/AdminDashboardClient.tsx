@@ -142,12 +142,23 @@ export function AdminDashboardClient() {
       setMessage("Saved to Supabase.");
     } else {
       setMessage("Saved locally (no backend). Price updated on storefront.");
-      fetch("/api/overrides", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: payload.id, data: payload })
-      }).catch(() => {});
     }
+
+    // Store only changed fields in cookie (keeps it under 4KB limit)
+    const original = products.find((p) => p.id === payload.id);
+    const diff: Record<string, unknown> = {};
+    if (original) {
+      for (const key of Object.keys(payload) as (keyof Product)[]) {
+        if (JSON.stringify(payload[key]) !== JSON.stringify(original[key])) {
+          diff[key] = payload[key];
+        }
+      }
+    }
+    fetch("/api/overrides", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: payload.id, data: Object.keys(diff).length > 0 ? diff : payload })
+    }).catch(() => {});
 
     setProducts((prev) => {
       const idx = prev.findIndex((p) => p.id === payload.id);
