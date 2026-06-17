@@ -37,10 +37,16 @@ function isCompleteProduct(data: unknown): data is Product {
 }
 
 function applyOverrides(products: Product[], overrides: Record<string, Partial<Product>>): Product[] {
-  const result = products.map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+  const result = products.map((p) => {
+    const override = overrides[p.id];
+    if (!override) return p;
+    const { category: _, ...safe } = override;
+    return { ...p, ...safe };
+  });
   for (const entry of Object.values(overrides)) {
     if (isCompleteProduct(entry) && !result.find((p) => p.id === entry.id)) {
-      result.push(entry);
+      const { category: _, ...clean } = entry;
+      result.push(clean);
     }
   }
   return result;

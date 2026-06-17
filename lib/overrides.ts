@@ -26,12 +26,15 @@ export async function applyOverrides<T extends Product>(products: T[]): Promise<
 
     const result = products.map((p) => {
       const override = overrides[p.id];
-      return override ? { ...p, ...override } : p;
+      if (!override) return p;
+      const { category: _, ...safe } = override;
+      return { ...p, ...safe };
     });
 
     for (const entry of Object.values(overrides)) {
       if (isValidProduct(entry) && !result.find((p) => p.id === entry.id)) {
-        result.push(entry as unknown as T);
+        const { category: _, ...clean } = entry;
+        result.push(clean as unknown as T);
       }
     }
 
