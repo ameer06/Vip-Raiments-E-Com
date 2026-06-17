@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { LogOut } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { LogOut, Upload, Loader2 } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatInr } from "@/lib/utils";
 
@@ -117,7 +117,7 @@ export function AdminDashboardClient() {
       fetch("/api/overrides", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: payload.id, data: { price: payload.price, stock: payload.stock } })
+        body: JSON.stringify({ id: payload.id, data: { price: payload.price, stock: payload.stock, images: payload.images } })
       }).catch(() => {});
     }
 
@@ -178,8 +178,8 @@ export function AdminDashboardClient() {
             <AdminField label="Stock" type="number" value={String(draft.stock)} onChange={(v) => setDraft((prev) => ({ ...prev, stock: Number(v) || 0 }))} />
             <AdminField label="Sizes (comma-separated)" value={draft.sizes.join(", ")} onChange={(v) => setDraft({ ...draft, sizes: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
             <AdminField label="Status" value={draft.status} onChange={(v) => setDraft({ ...draft, status: v as Product["status"] })} />
-            <AdminField label="Front image URL" value={draft.images[0]} onChange={(v) => setDraft({ ...draft, images: [v, draft.images[1]] })} />
-            <AdminField label="Hover image URL" value={draft.images[1]} onChange={(v) => setDraft({ ...draft, images: [draft.images[0], v] })} />
+            <AdminImageField label="Front image" value={draft.images[0]} onChange={(v) => setDraft({ ...draft, images: [v, draft.images[1]] })} />
+            <AdminImageField label="Hover image" value={draft.images[1]} onChange={(v) => setDraft({ ...draft, images: [draft.images[0], v] })} />
           </div>
           <div className="mt-5 flex gap-2">
             <button type="submit" disabled={isSaving} className="h-11 flex-1 rounded-control bg-ink text-sm font-semibold text-white disabled:opacity-50">
@@ -303,5 +303,73 @@ function AdminField({
         className="h-11 rounded-control border border-ink/20 bg-white px-3 text-sm font-normal text-ink outline-none transition-colors focus:border-ink"
       />
     </label>
+  );
+}
+
+function AdminImageField({
+  label,
+  value,
+  onChange
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const res = await fetch("/api/admin/upload-local", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (data.ok) {
+        onChange(data.url);
+      } else {
+        setError(data.error || "Upload failed");
+      }
+    } catch {
+      setError("Upload failed");
+    }
+    setUploading(false);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  return (
+    <div className="grid gap-1.5">
+      <span className="label-mono">{label}</span>
+      <div className="flex gap-2">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/webp,image/jpeg,image/png"
+          className="hidden"
+          onChange={handleFile}
+        />
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="flex h-11 w-full items-center justify-center gap-1.5 rounded-control bg-ink px-3 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? "Uploading..." : "Upload image"}
+        </button>
+        {value && (
+          <img src={value} alt="" className="h-11 w-11 shrink-0 rounded-control border border-ink/10 object-cover" />
+        )}
+      </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
   );
 }
