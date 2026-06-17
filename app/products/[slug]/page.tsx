@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { ProductAddToCart } from "@/components/features/ProductAddToCart";
-import { getActiveProducts, getProductBySlug } from "@/lib/products/get-products";
+import { getProductBySlug } from "@/lib/products/get-products";
+import { featuredProducts } from "@/data/products";
 import { formatInr } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -14,11 +15,12 @@ type ProductPageProps = {
   }>;
 };
 
-export async function generateStaticParams() {
-  const products = await getActiveProducts();
-  return products.map((product) => ({
-    slug: product.slug
-  }));
+export function generateStaticParams() {
+  return featuredProducts
+    .filter((p) => p.status === "active")
+    .map((product) => ({
+      slug: product.slug
+    }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {
