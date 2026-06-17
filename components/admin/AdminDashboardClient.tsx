@@ -20,8 +20,30 @@ function saveOverrides(overrides: Record<string, Partial<Product>>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
 }
 
+function isCompleteProduct(data: unknown): data is Product {
+  if (!data || typeof data !== "object") return false;
+  const d = data as Record<string, unknown>;
+  return (
+    typeof d.id === "string" &&
+    typeof d.name === "string" &&
+    typeof d.slug === "string" &&
+    typeof d.price === "number" &&
+    Array.isArray(d.images) &&
+    d.images.length >= 2 &&
+    Array.isArray(d.sizes) &&
+    typeof d.status === "string" &&
+    typeof d.color === "string"
+  );
+}
+
 function applyOverrides(products: Product[], overrides: Record<string, Partial<Product>>): Product[] {
-  return products.map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+  const result = products.map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+  for (const entry of Object.values(overrides)) {
+    if (isCompleteProduct(entry) && !result.find((p) => p.id === entry.id)) {
+      result.push(entry);
+    }
+  }
+  return result;
 }
 
 const emptyProduct = (): Product => ({
