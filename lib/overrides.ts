@@ -3,9 +3,6 @@ import type { Product } from "@/data/products";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { hasSupabaseEnv } from "@/lib/supabase/server";
 
-const BUCKET = "product-overrides";
-const FILE = "overrides.json";
-
 function isValidProduct(data: unknown): data is Product {
   if (!data || typeof data !== "object") return false;
   const d = data as Record<string, unknown>;
@@ -43,6 +40,30 @@ function applyOverrideMap<T extends Product>(
   return result;
 }
 
+type OverrideRow = {
+  product_id: string;
+  overrides: Partial<Product>;
+};
+
+async function readOverridesFromTable(): Promise<Record<string, Partial<Product>> | null> {
+  if (!hasSupabaseEnv()) return null;
+  try {
+    const supabase = createSupabasePublicClient();
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from("product_overrides")
+      .select("product_id, overrides");
+    if (error || !data?.length) return null;
+    const map: Record<string, Partial<Product>> = {};
+    for (const row of data as OverrideRow[]) {
+      map[row.product_id] = row.overrides;
+    }
+    return map;
+  } catch {
+    return null;
+  }
+}
+
 async function readOverridesFromCookie(): Promise<Record<string, Partial<Product>> | null> {
   try {
     const store = await cookies();
@@ -54,25 +75,11 @@ async function readOverridesFromCookie(): Promise<Record<string, Partial<Product
   }
 }
 
-async function readOverridesFromStorage(): Promise<Record<string, Partial<Product>> | null> {
-  if (!hasSupabaseEnv()) return null;
-  try {
-    const supabase = createSupabasePublicClient();
-    if (!supabase) return null;
-    const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(FILE);
-    const res = await fetch(publicUrl, { next: { revalidate: 30 } });
-    if (!res.ok) return null;
-    return await res.json() as Record<string, Partial<Product>>;
-  } catch {
-    return null;
-  }
-}
-
 export async function applyOverrides<T extends Product>(products: T[]): Promise<T[]> {
-  // Try Supabase Storage first (shared across all devices)
-  const storageOverrides = await readOverridesFromStorage();
-  if (storageOverrides) {
-    return applyOverrideMap(products, storageOverrides);
+  // Try product_overrides table first (shared across all devices, no service role key needed)
+  const tableOverrides = await readOverridesFromTable();
+  if (tableOverrides) {
+    return applyOverrideMap(products, tableOverrides);
   }
 
   // Fall back to cookie (same-browser only)

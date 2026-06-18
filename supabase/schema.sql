@@ -163,3 +163,31 @@ on public.payment_intents for update
 to anon, authenticated
 using (true)
 with check (true);
+
+-- Product overrides (cross-device admin edits, no service role key needed)
+create table if not exists public.product_overrides (
+  product_id text primary key,
+  overrides jsonb not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
+alter table public.product_overrides enable row level security;
+
+drop policy if exists "Anyone can read product_overrides" on public.product_overrides;
+create policy "Anyone can read product_overrides"
+on public.product_overrides for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Admin users can insert product_overrides" on public.product_overrides;
+create policy "Admin users can insert product_overrides"
+on public.product_overrides for insert
+to authenticated
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
+drop policy if exists "Admin users can update product_overrides" on public.product_overrides;
+create policy "Admin users can update product_overrides"
+on public.product_overrides for update
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
