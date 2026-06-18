@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import type { Product } from "@/data/products";
 import { requireAdmin } from "@/lib/auth/require-admin";
@@ -27,6 +28,11 @@ export async function POST(request: Request) {
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
+
+  // Purge cached pages so new/updated products appear everywhere (including mobile)
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/products/[slug]", "page");
 
   return NextResponse.json({ ok: true });
 }

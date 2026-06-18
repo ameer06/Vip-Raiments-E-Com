@@ -6,6 +6,12 @@ import { ProductAddToCart } from "@/components/features/ProductAddToCart";
 import { getActiveProducts, getProductBySlug } from "@/lib/products/get-products";
 import { formatInr } from "@/lib/utils";
 
+// Allow newly created product slugs to be rendered on-demand (not only pre-built ones)
+export const dynamicParams = true;
+
+// Re-fetch product data at most every 60 seconds
+export const revalidate = 60;
+
 type ProductPageProps = {
   params: Promise<{
     slug: string;
