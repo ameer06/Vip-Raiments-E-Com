@@ -21,11 +21,11 @@ export default async function ProductsPage({
 
   const title = filter
     ? `${filter.charAt(0).toUpperCase() + filter.slice(1)}`
-    : "All shits";
+    : "All shirts";
 
   return (
     <ProductGrid
-      eyebrow={filter ?? "all shits"}
+      eyebrow={filter ?? "all shirts"}
       title={title}
       products={products}
       className="pt-8 sm:pt-12"

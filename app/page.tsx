@@ -5,7 +5,7 @@ import { getActiveProducts } from "@/lib/products/get-products";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "VIP Raiments | Premium Streetwear Shits"
+  title: "VIP Raiments | Premium Streetwear Shirts"
 };
 
 export default async function HomePage() {

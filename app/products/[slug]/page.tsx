@@ -66,7 +66,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-ink/60 hover:text-ink sm:mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to shits
+          Back to shirts
         </Link>
         <p className="label-mono mb-2 text-ink/50 sm:mb-3">
           {product.badge ?? "Limited"}

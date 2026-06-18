@@ -25,7 +25,7 @@ export function Hero() {
               Wear the room before you enter it.
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-ink/60 sm:text-lg">
-              Monochrome pants, sharp t-shits, and premium black & white
+              Monochrome pants, sharp t-shirts, and premium black & white
               details built for high-velocity weekly releases.
             </p>
             <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">

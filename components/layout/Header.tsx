@@ -8,8 +8,8 @@ import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/products", label: "Shits" },
-  { href: "/products?filter=t-shits", label: "T-shits" },
+  { href: "/products", label: "Shirts" },
+  { href: "/products?filter=t-shirts", label: "T-shirts" },
   { href: "/products?filter=pants", label: "Pants" }
 ];
 

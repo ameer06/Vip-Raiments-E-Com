@@ -10,7 +10,7 @@ export function Marquee({ items }: MarqueeProps) {
   const loop = [...items, ...items];
 
   return (
-    <div className="overflow-hidden whitespace-nowrap" aria-label="Trending shits">
+    <div className="overflow-hidden whitespace-nowrap" aria-label="Trending shirts">
       <motion.div
         className="inline-flex min-w-full gap-8"
         animate={{ x: ["0%", "-50%"] }}

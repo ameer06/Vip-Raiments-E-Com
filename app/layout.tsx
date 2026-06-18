@@ -16,9 +16,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VIP Raiments | Premium Streetwear Shits",
+  title: "VIP Raiments | Premium Streetwear Shirts",
   description:
-    "A premium, mobile-first commerce experience for limited clothing shits.",
+    "A premium, mobile-first commerce experience for limited clothing shirts.",
   metadataBase: new URL("https://vip-raiments.vercel.app")
 };
 
