@@ -86,6 +86,26 @@ on public.order_items for select
 to anon, authenticated
 using (true);
 
+-- Admin users can read/insert/update all products (used when SUPABASE_SERVICE_ROLE_KEY is not set)
+drop policy if exists "Admin users can read all products" on public.products;
+create policy "Admin users can read all products"
+on public.products for select
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
+drop policy if exists "Admin users can insert products" on public.products;
+create policy "Admin users can insert products"
+on public.products for insert
+to authenticated
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
+drop policy if exists "Admin users can update products" on public.products;
+create policy "Admin users can update products"
+on public.products for update
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
 -- Admin users (if not already created)
 create table if not exists public.admin_users (
   id uuid primary key default gen_random_uuid(),

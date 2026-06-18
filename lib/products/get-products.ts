@@ -2,7 +2,7 @@ import { featuredProducts, type Product } from "@/data/products";
 import { mapProductRow, mapProductToRow, type ProductRow } from "@/lib/products/map";
 import { createSupabaseAdminClient, hasSupabaseServiceRole } from "@/lib/supabase/admin";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
-import { hasSupabaseEnv } from "@/lib/supabase/server";
+import { createSupabaseServerClient, hasSupabaseEnv } from "@/lib/supabase/server";
 import { applyOverrides } from "@/lib/overrides";
 
 function getStaticActiveProducts() {
@@ -73,21 +73,33 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 }
 
 export async function getAllProductsAdmin(): Promise<Product[]> {
-  if (!hasSupabaseServiceRole()) {
-    return applyOverrides(getStaticAllProducts());
+  // Try service role key first (bypasses RLS)
+  if (hasSupabaseServiceRole()) {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error && data?.length) {
+      return applyOverrides((data as ProductRow[]).map(mapProductRow));
+    }
   }
 
-  const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
+  // Fallback: use server client (admin's auth session + RLS)
+  if (hasSupabaseEnv()) {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  if (error || !data?.length) {
-    return applyOverrides(getStaticAllProducts());
+    if (!error && data?.length) {
+      return applyOverrides((data as ProductRow[]).map(mapProductRow));
+    }
   }
 
-  return applyOverrides((data as ProductRow[]).map(mapProductRow));
+  return applyOverrides(getStaticAllProducts());
 }
 
 export async function upsertProduct(product: Product) {
