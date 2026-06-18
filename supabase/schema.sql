@@ -14,6 +14,7 @@ create table if not exists public.products (
   front_image_url text not null,
   hover_image_url text not null,
   is_priority boolean not null default false,
+  category text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -85,6 +86,26 @@ on public.order_items for select
 to anon, authenticated
 using (true);
 
+-- Admin users can read/insert/update all products (used when SUPABASE_SERVICE_ROLE_KEY is not set)
+drop policy if exists "Admin users can read all products" on public.products;
+create policy "Admin users can read all products"
+on public.products for select
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
+drop policy if exists "Admin users can insert products" on public.products;
+create policy "Admin users can insert products"
+on public.products for insert
+to authenticated
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
+drop policy if exists "Admin users can update products" on public.products;
+create policy "Admin users can update products"
+on public.products for update
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
 -- Admin users (if not already created)
 create table if not exists public.admin_users (
   id uuid primary key default gen_random_uuid(),
@@ -101,3 +122,72 @@ create policy "Users can read their own admin row"
 on public.admin_users for select
 to authenticated
 using (auth.uid() = user_id);
+
+-- Payment intents (UPI gateway-less)
+create table if not exists public.payment_intents (
+  id uuid primary key default gen_random_uuid(),
+  txn_id text not null unique,
+  order_ref text not null,
+  amount integer not null check (amount > 0),
+  status text not null default 'pending' check (status in ('pending', 'confirmed', 'failed')),
+  customer_email text not null,
+  customer_name text not null,
+  customer_phone text,
+  upi_link text,
+  checkout_payload jsonb,
+  provider_ref text,
+  created_at timestamptz not null default now(),
+  confirmed_at timestamptz
+);
+
+create index if not exists payment_intents_status_idx on public.payment_intents (status);
+create index if not exists payment_intents_txn_id_idx on public.payment_intents (txn_id);
+
+alter table public.payment_intents enable row level security;
+
+drop policy if exists "Anyone can insert payment intents" on public.payment_intents;
+create policy "Anyone can insert payment intents"
+on public.payment_intents for insert
+to anon, authenticated
+with check (true);
+
+drop policy if exists "Anyone can read payment intents" on public.payment_intents;
+create policy "Anyone can read payment intents"
+on public.payment_intents for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Anyone can update payment intents" on public.payment_intents;
+create policy "Anyone can update payment intents"
+on public.payment_intents for update
+to anon, authenticated
+using (true)
+with check (true);
+
+-- Product overrides (cross-device admin edits, no service role key needed)
+create table if not exists public.product_overrides (
+  product_id text primary key,
+  overrides jsonb not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
+alter table public.product_overrides enable row level security;
+
+drop policy if exists "Anyone can read product_overrides" on public.product_overrides;
+create policy "Anyone can read product_overrides"
+on public.product_overrides for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Admin users can insert product_overrides" on public.product_overrides;
+create policy "Admin users can insert product_overrides"
+on public.product_overrides for insert
+to authenticated
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
+drop policy if exists "Admin users can update product_overrides" on public.product_overrides;
+create policy "Admin users can update product_overrides"
+on public.product_overrides for update
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id = auth.uid()));

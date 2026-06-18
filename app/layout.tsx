@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Layout } from "@/components/layout/Layout";
 
@@ -9,10 +9,16 @@ const inter = Inter({
   variable: "--font-inter"
 });
 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono"
+});
+
 export const metadata: Metadata = {
-  title: "VIP Raiments | Premium Streetwear Drops",
+  title: "VIP Raiments | Premium Streetwear Shirts",
   description:
-    "A premium, mobile-first commerce experience for limited clothing drops.",
+    "A premium, mobile-first commerce experience for limited clothing shirts.",
   metadataBase: new URL("https://vip-raiments.vercel.app")
 };
 
@@ -22,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="font-sans antialiased">
         <Layout>{children}</Layout>
       </body>

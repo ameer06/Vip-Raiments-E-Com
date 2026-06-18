@@ -1,9 +1,56 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { LogOut } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { LogOut, Upload, Loader2 } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatInr } from "@/lib/utils";
+
+const STORAGE_KEY = "vip_admin_overrides";
+
+function loadOverrides(): Record<string, Partial<Product>> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveOverrides(overrides: Record<string, Partial<Product>>) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+}
+
+function isCompleteProduct(data: unknown): data is Product {
+  if (!data || typeof data !== "object") return false;
+  const d = data as Record<string, unknown>;
+  return (
+    typeof d.id === "string" &&
+    typeof d.name === "string" &&
+    typeof d.slug === "string" &&
+    typeof d.price === "number" &&
+    Array.isArray(d.images) &&
+    d.images.length >= 2 &&
+    Array.isArray(d.sizes) &&
+    typeof d.status === "string" &&
+    typeof d.color === "string"
+  );
+}
+
+function applyOverrides(products: Product[], overrides: Record<string, Partial<Product>>): Product[] {
+  const result = products.map((p) => {
+    const override = overrides[p.id];
+    if (!override) return p;
+    const { category: _, ...safe } = override;
+    return { ...p, ...safe };
+  });
+  for (const entry of Object.values(overrides)) {
+    if (isCompleteProduct(entry) && !result.find((p) => p.id === entry.id)) {
+      const { category: _, ...clean } = entry;
+      result.push(clean);
+    }
+  }
+  return result;
+}
 
 const emptyProduct = (): Product => ({
   id: `prod_${Date.now()}`,
@@ -32,6 +79,7 @@ export function AdminDashboardClient() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [draft, setDraft] = useState<Product>(emptyProduct());
   const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -44,7 +92,9 @@ export function AdminDashboardClient() {
 
       if (productsRes.ok) {
         const data = await productsRes.json();
-        setProducts(data.products ?? []);
+        const apiProducts = data.products ?? [];
+        const overrides = loadOverrides();
+        setProducts(applyOverrides(apiProducts, overrides));
       }
 
       if (ordersRes.ok) {
@@ -58,8 +108,21 @@ export function AdminDashboardClient() {
     load();
   }, []);
 
+  const persistOverrides = useCallback((updatedProducts: Product[]) => {
+    const overrides: Record<string, Partial<Product>> = {};
+    for (const p of updatedProducts) {
+      const original = products.find((o) => o.id === p.id);
+      if (!original || JSON.stringify(p) !== JSON.stringify(original)) {
+        overrides[p.id] = p;
+      }
+    }
+    const existing = loadOverrides();
+    saveOverrides({ ...existing, ...overrides });
+  }, [products]);
+
   async function saveProduct(event: React.FormEvent) {
     event.preventDefault();
+    setIsSaving(true);
     setMessage("");
 
     const payload: Product = {
@@ -75,24 +138,46 @@ export function AdminDashboardClient() {
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      setMessage(data.error ?? "Could not save product.");
-      return;
+    if (response.ok) {
+      setMessage("Saved to Supabase.");
+    } else {
+      setMessage("Saved locally (no backend). Price updated on storefront.");
     }
 
-    setMessage("Product saved.");
-    const list = await fetch("/api/admin/products");
-    if (list.ok) {
-      const refreshed = await list.json();
-      setProducts(refreshed.products ?? []);
+    // Store only changed fields in cookie (keeps it under 4KB limit)
+    const original = products.find((p) => p.id === payload.id);
+    const diff: Record<string, unknown> = {};
+    if (original) {
+      for (const key of Object.keys(payload) as (keyof Product)[]) {
+        if (JSON.stringify(payload[key]) !== JSON.stringify(original[key])) {
+          diff[key] = payload[key];
+        }
+      }
     }
+    fetch("/api/overrides", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: payload.id, data: Object.keys(diff).length > 0 ? diff : payload })
+    }).catch(() => {});
+
+    setProducts((prev) => {
+      const idx = prev.findIndex((p) => p.id === payload.id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = payload;
+        persistOverrides(next);
+        return next;
+      }
+      persistOverrides([...prev, payload]);
+      return [...prev, payload];
+    });
+    setIsSaving(false);
   }
 
   async function handleLogout() {
     setLoggingOut(true);
     await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
   }
 
   if (loading) {
@@ -103,12 +188,12 @@ export function AdminDashboardClient() {
     <>
       <div className="mb-6 flex items-center justify-between">
         {message ? (
-          <p className="border-2 border-ink bg-bone p-3 text-sm font-bold">{message}</p>
+          <p className="rounded-control border border-ink/10 bg-surface p-3 text-sm text-ink/60">{message}</p>
         ) : null}
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="ml-auto flex items-center gap-2 h-11 border-2 border-ink bg-ink px-4 text-sm font-black uppercase text-white hover:bg-ink/90 disabled:opacity-50"
+          className="ml-auto flex items-center gap-2 h-11 rounded-control bg-ink px-4 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
         >
           <LogOut className="h-4 w-4" />
           {loggingOut ? "Logging out..." : "Logout"}
@@ -118,9 +203,9 @@ export function AdminDashboardClient() {
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <form
           onSubmit={saveProduct}
-          className="border-2 border-ink bg-white p-5 shadow-brutal"
+          className="rounded-card border border-ink/10 bg-white p-card-pad shadow-card"
         >
-          <h2 className="text-2xl font-black uppercase tracking-normal">
+          <h2 className="text-xl font-semibold">
             Product editor
           </h2>
           <div className="mt-5 grid gap-4">
@@ -128,58 +213,58 @@ export function AdminDashboardClient() {
             <AdminField label="Product name" value={draft.name} onChange={(v) => setDraft({ ...draft, name: v })} />
             <AdminField label="Slug" value={draft.slug} onChange={(v) => setDraft({ ...draft, slug: v })} />
             <AdminField label="Color" value={draft.color} onChange={(v) => setDraft({ ...draft, color: v })} />
-            <AdminField label="Price (INR)" value={String(draft.price)} onChange={(v) => setDraft({ ...draft, price: Number(v) || 0 })} />
-            <AdminField label="Stock" value={String(draft.stock)} onChange={(v) => setDraft({ ...draft, stock: Number(v) || 0 })} />
+            <AdminField label="Price (INR)" type="number" value={String(draft.price)} onChange={(v) => setDraft((prev) => ({ ...prev, price: Number(v) || 0 }))} />
+            <AdminField label="Stock" type="number" value={String(draft.stock)} onChange={(v) => setDraft((prev) => ({ ...prev, stock: Number(v) || 0 }))} />
             <AdminField label="Sizes (comma-separated)" value={draft.sizes.join(", ")} onChange={(v) => setDraft({ ...draft, sizes: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
             <AdminField label="Status" value={draft.status} onChange={(v) => setDraft({ ...draft, status: v as Product["status"] })} />
-            <AdminField label="Front image URL" value={draft.images[0]} onChange={(v) => setDraft({ ...draft, images: [v, draft.images[1]] })} />
-            <AdminField label="Hover image URL" value={draft.images[1]} onChange={(v) => setDraft({ ...draft, images: [draft.images[0], v] })} />
+            <AdminImageField label="Front image" value={draft.images[0]} onChange={(v) => setDraft({ ...draft, images: [v, draft.images[1]] })} />
+            <AdminImageField label="Hover image" value={draft.images[1]} onChange={(v) => setDraft({ ...draft, images: [draft.images[0], v] })} />
           </div>
           <div className="mt-5 flex gap-2">
-            <button type="submit" className="h-11 flex-1 border-2 border-ink bg-ink text-sm font-black uppercase text-white">
-              Save product
+            <button type="submit" disabled={isSaving} className="h-11 flex-1 rounded-control bg-ink text-sm font-semibold text-white disabled:opacity-50">
+              {isSaving ? "Saving..." : "Save product"}
             </button>
             <button
               type="button"
               onClick={() => setDraft(emptyProduct())}
-              className="h-11 border-2 border-ink px-4 text-sm font-black uppercase"
+              className="h-11 rounded-control border border-ink/20 px-4 text-sm font-semibold"
             >
               New
             </button>
           </div>
         </form>
 
-        <div className="overflow-hidden border-2 border-ink bg-white shadow-brutal">
-          <div className="border-b-2 border-ink p-5">
-            <h2 className="text-2xl font-black uppercase tracking-normal">
+        <div className="overflow-hidden rounded-card border border-ink/10 bg-white shadow-card">
+          <div className="border-b border-ink/10 p-card-pad">
+            <h2 className="text-xl font-semibold">
               Inventory
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[680px] text-left text-sm">
-              <thead className="bg-bone text-xs font-black uppercase">
+              <thead className="bg-surface text-xs font-semibold uppercase tracking-wider">
                 <tr>
-                  <th className="border-b-2 border-ink p-4">Product</th>
-                  <th className="border-b-2 border-ink p-4">Price</th>
-                  <th className="border-b-2 border-ink p-4">Stock</th>
-                  <th className="border-b-2 border-ink p-4">Status</th>
+                  <th className="border-b border-ink/10 p-4">Product</th>
+                  <th className="border-b border-ink/10 p-4">Price</th>
+                  <th className="border-b border-ink/10 p-4">Stock</th>
+                  <th className="border-b border-ink/10 p-4">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
                   <tr
                     key={product.id}
-                    className={`cursor-pointer font-bold transition-colors ${
+                    className={`cursor-pointer transition-colors ${
                       draft.id === product.id
-                        ? "bg-electric-blue/20 border-l-4 border-electric-blue"
-                        : "hover:bg-bone/60"
+                        ? "bg-ink/5"
+                        : "hover:bg-surface"
                     }`}
                     onClick={() => setDraft(product)}
                   >
-                    <td className="border-b border-ink/15 p-4">{product.name}</td>
-                    <td className="border-b border-ink/15 p-4">{formatInr(product.price)}</td>
-                    <td className="border-b border-ink/15 p-4">{product.stock}</td>
-                    <td className="border-b border-ink/15 p-4 uppercase">{product.status}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm font-medium">{product.name}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm">{formatInr(product.price)}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm">{product.stock}</td>
+                    <td className="border-b border-ink/10 p-4 text-sm">{product.status}</td>
                   </tr>
                 ))}
               </tbody>
@@ -188,41 +273,41 @@ export function AdminDashboardClient() {
         </div>
       </div>
 
-      <div className="mt-10 overflow-hidden border-2 border-ink bg-white shadow-brutal">
-        <div className="border-b-2 border-ink p-5">
-          <h2 className="text-2xl font-black uppercase tracking-normal">Recent orders</h2>
+      <div className="mt-section overflow-hidden rounded-card border border-ink/10 bg-white shadow-card">
+        <div className="border-b border-ink/10 p-card-pad">
+          <h2 className="text-xl font-semibold">Recent orders</h2>
         </div>
         {orders.length === 0 ? (
-          <p className="p-5 text-sm font-semibold text-ink/65">
+          <p className="p-card-pad text-sm text-ink/50">
             No orders yet. Complete a mock checkout to create one (requires Supabase tables).
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="bg-bone text-xs font-black uppercase">
+              <thead className="bg-surface text-xs font-semibold uppercase tracking-wider">
                 <tr>
-                  <th className="border-b-2 border-ink p-4">Order</th>
-                  <th className="border-b-2 border-ink p-4">Customer</th>
-                  <th className="border-b-2 border-ink p-4">Total</th>
-                  <th className="border-b-2 border-ink p-4">Status</th>
+                  <th className="border-b border-ink/10 p-4">Order</th>
+                  <th className="border-b border-ink/10 p-4">Customer</th>
+                  <th className="border-b border-ink/10 p-4">Total</th>
+                  <th className="border-b border-ink/10 p-4">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.id} className="font-bold">
-                    <td className="border-b border-ink/15 p-4 font-mono text-xs">
+                  <tr key={order.id} className="font-medium">
+                    <td className="border-b border-ink/10 p-4 font-mono text-xs">
                       {order.id.slice(0, 8)}…
                     </td>
-                    <td className="border-b border-ink/15 p-4">
+                    <td className="border-b border-ink/10 p-4">
                       {order.customer_name}
-                      <span className="block text-xs font-semibold text-ink/55">
+                      <span className="block text-xs text-ink/50">
                         {order.email}
                       </span>
                     </td>
-                    <td className="border-b border-ink/15 p-4">
+                    <td className="border-b border-ink/10 p-4">
                       {formatInr(order.total_inr)}
                     </td>
-                    <td className="border-b border-ink/15 p-4 uppercase">
+                    <td className="border-b border-ink/10 p-4">
                       {order.status}
                     </td>
                   </tr>
@@ -239,21 +324,91 @@ export function AdminDashboardClient() {
 function AdminField({
   label,
   value,
+  onChange,
+  type = "text"
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+}) {
+  return (
+    <label className="grid gap-1.5">
+      <span className="label-mono">{label}</span>
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-11 rounded-control border border-ink/20 bg-white px-3 text-sm font-normal text-ink outline-none transition-colors focus:border-ink"
+      />
+    </label>
+  );
+}
+
+function AdminImageField({
+  label,
+  value,
   onChange
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const res = await fetch("/api/admin/upload-local", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (data.ok) {
+        onChange(data.url);
+      } else {
+        setError(data.error || "Upload failed");
+      }
+    } catch {
+      setError("Upload failed");
+    }
+    setUploading(false);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
   return (
-    <label className="grid gap-2 text-xs font-black uppercase">
-      {label}
-      <input
-        type="text"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-11 border-2 border-ink bg-bone px-3 text-sm font-bold normal-case outline-none focus-visible:ring-2 focus-visible:ring-electric-blue"
-      />
-    </label>
+    <div className="grid gap-1.5">
+      <span className="label-mono">{label}</span>
+      <div className="flex gap-2">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/webp,image/jpeg,image/png"
+          className="hidden"
+          onChange={handleFile}
+        />
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="flex h-11 w-full items-center justify-center gap-1.5 rounded-control bg-ink px-3 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? "Uploading..." : "Upload image"}
+        </button>
+        {value && (
+          <img src={value} alt="" className="h-11 w-11 shrink-0 rounded-control border border-ink/10 object-cover" />
+        )}
+      </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
   );
 }

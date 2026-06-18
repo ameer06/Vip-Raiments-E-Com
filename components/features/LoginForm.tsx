@@ -57,46 +57,46 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       {!isConfigured ? (
-        <div className="border-2 border-ink bg-bone p-3 text-sm font-bold text-ink/72">
+        <div className="rounded-control border border-ink/10 bg-surface p-3 text-sm text-ink/60">
           Supabase is not configured yet. Add the environment variables in
           `.env.local` for local login and in Vercel for live login.
         </div>
       ) : null}
 
       {message ? (
-        <div className="border-2 border-ink bg-bone p-3 text-sm font-bold text-ink/72">
+        <div className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {message}
         </div>
       ) : null}
 
-      <label className="grid gap-2 text-xs font-black uppercase">
-        Email
+      <label className="grid gap-1.5">
+        <span className="label-mono">Email</span>
         <input
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           autoComplete="email"
           required
-          className="h-11 border-2 border-ink bg-bone px-3 text-sm font-bold normal-case outline-none focus-visible:ring-2 focus-visible:ring-electric-blue"
+          className="h-11 rounded-control border border-ink/20 bg-white px-3 text-sm font-normal text-ink outline-none transition-colors focus:border-ink"
         />
       </label>
 
-      <label className="grid gap-2 text-xs font-black uppercase">
-        Password
+      <label className="grid gap-1.5">
+        <span className="label-mono">Password</span>
         <input
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="current-password"
           required
-          className="h-11 border-2 border-ink bg-bone px-3 text-sm font-bold normal-case outline-none focus-visible:ring-2 focus-visible:ring-electric-blue"
+          className="h-11 rounded-control border border-ink/20 bg-white px-3 text-sm font-normal text-ink outline-none transition-colors focus:border-ink"
         />
       </label>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="inline-flex h-11 w-full items-center justify-center gap-2 border-2 border-ink bg-ink px-4 text-sm font-black uppercase text-white shadow-brutal-blue disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-control bg-ink px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         <LogIn className="h-4 w-4" />
         {isSubmitting ? "Signing in" : "Sign in"}

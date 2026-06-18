@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import type { Product } from "@/data/products";
 import { AddToCartButton } from "@/components/features/AddToCartButton";
 import { formatInr } from "@/lib/utils";
@@ -13,11 +12,7 @@ type ProductCardProps = {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <motion.article
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 360, damping: 24 }}
-      className="group overflow-hidden border-2 border-ink bg-white shadow-brutal"
-    >
+    <article className="group overflow-hidden rounded-card border border-ink/10 bg-white shadow-card hover:shadow-card-hover">
       <Link
         href={`/products/${product.slug}`}
         className="relative block aspect-[4/5] overflow-hidden bg-ink"
@@ -27,7 +22,7 @@ export function ProductCard({ product }: ProductCardProps) {
           alt={product.name}
           fill
           sizes="(min-width: 1024px) 25vw, 50vw"
-          className="object-cover grayscale transition duration-500 group-hover:opacity-0"
+          className="object-cover transition duration-500 group-hover:opacity-0"
           priority={product.isPriority}
         />
         <Image
@@ -35,27 +30,27 @@ export function ProductCard({ product }: ProductCardProps) {
           alt=""
           fill
           sizes="(min-width: 1024px) 25vw, 50vw"
-          className="object-cover opacity-0 grayscale transition duration-500 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0"
+          className="object-cover opacity-0 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
         />
         {product.badge ? (
-          <span className="absolute left-2 top-2 border-2 border-ink bg-electric-blue px-1.5 py-0.5 text-[10px] font-black uppercase text-white sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-[11px]">
+          <span className="label-mono absolute left-3 top-3 rounded-control bg-ink px-2 py-1 text-white sm:left-4 sm:top-4 sm:px-3 sm:py-1.5">
             {product.badge}
           </span>
         ) : null}
       </Link>
 
-      <div className="grid gap-2 p-2.5 sm:gap-4 sm:p-4">
-        <div className="flex items-start justify-between gap-2 sm:gap-3">
-          <div className="min-w-0 flex-1">
-            <h3 className="truncate text-xs font-black uppercase tracking-normal sm:text-base">
+      <div className="grid gap-2 p-card-pad">
+        <div className="min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="truncate text-sm font-semibold">
               <Link href={`/products/${product.slug}`}>{product.name}</Link>
             </h3>
-            <p className="mt-0.5 truncate text-xs font-semibold text-ink/60 sm:mt-1 sm:text-sm">
-              {product.color}
+            <p className="shrink-0 whitespace-nowrap text-sm font-semibold">
+              {formatInr(product.price)}
             </p>
           </div>
-          <p className="shrink-0 text-right text-xs font-black leading-tight sm:text-sm">
-            {formatInr(product.price)}
+          <p className="mt-0.5 truncate text-sm text-ink/50">
+            {product.color}
           </p>
         </div>
 
@@ -63,9 +58,9 @@ export function ProductCard({ product }: ProductCardProps) {
           product={product}
           label="Quick add"
           fullWidth
-          className="h-8 bg-bone px-2 text-[10px] shadow-none hover:bg-electric-blue hover:text-white sm:h-10 sm:px-3 sm:text-xs"
+          className="h-9 rounded-control bg-stone-800 px-3 text-xs font-semibold text-white"
         />
       </div>
-    </motion.article>
+    </article>
   );
 }

@@ -4,9 +4,8 @@
 
 :root {
   color-scheme: light;
-  --background: #f4f2ed;
-  --foreground: #050505;
-  --accent: #175cff;
+  --background: #ffffff;
+  --foreground: #111827;
 }
 
 * {
@@ -15,44 +14,29 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: clip;
 }
 
 body {
   min-height: 100vh;
   overflow-x: clip;
-  background:
-    linear-gradient(rgba(5, 5, 5, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(5, 5, 5, 0.035) 1px, transparent 1px),
-    var(--background);
-  background-size: 28px 28px;
+  background: var(--background);
   color: var(--foreground);
 }
 
 ::selection {
-  background: var(--accent);
+  background: #111827;
   color: white;
 }
 
 @layer base {
   a,
   button {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-electric-blue focus-visible:ring-offset-2 focus-visible:ring-offset-bone;
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
 }
 
 @layer components {
-  .brutal-border {
-    @apply border-2 border-ink shadow-brutal;
-  }
-
-  .brutal-border-blue {
-    @apply border-2 border-ink shadow-brutal-blue;
-  }
-
-  /* Reserve space so offset brutal shadows are not clipped */
-  .brutal-shadow-room {
-    padding-right: 5px;
-    padding-bottom: 5px;
+  .label-mono {
+    @apply font-mono text-xs font-semibold uppercase tracking-wider;
   }
 }

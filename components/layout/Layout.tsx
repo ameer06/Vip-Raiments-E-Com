@@ -10,7 +10,7 @@ type LayoutProps = {
 export function Layout({ children }: LayoutProps) {
   return (
     <CartProvider>
-      <div className="min-h-screen overflow-x-clip bg-bone text-ink">
+      <div className="min-h-screen overflow-x-clip bg-white text-ink">
         <Header />
         <main className="w-full">{children}</main>
         <Footer />
