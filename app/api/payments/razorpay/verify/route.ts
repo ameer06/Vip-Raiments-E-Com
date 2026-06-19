@@ -106,20 +106,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update product stock
+    // Update product stock (silently skip if products table doesn't exist)
     for (const item of body.cartItems) {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock")
-        .eq("id", item.productId)
-        .single();
-
-      if (product) {
-        const newStock = Math.max(0, product.stock - item.quantity);
-        await supabase
+      try {
+        const { data: product } = await supabase
           .from("products")
-          .update({ stock: newStock })
-          .eq("id", item.productId);
+          .select("stock")
+          .eq("id", item.productId)
+          .single();
+
+        if (product) {
+          const newStock = Math.max(0, product.stock - item.quantity);
+          await supabase
+            .from("products")
+            .update({ stock: newStock })
+            .eq("id", item.productId);
+        }
+      } catch {
+        // products table doesn't exist — skip stock update
       }
     }
 

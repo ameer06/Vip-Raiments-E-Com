@@ -56,29 +56,33 @@ export async function POST(request: Request) {
     );
 
     for (const item of payload.items) {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock, status")
-        .eq("id", item.productId)
-        .maybeSingle();
+      try {
+        const { data: product } = await supabase
+          .from("products")
+          .select("stock, status")
+          .eq("id", item.productId)
+          .maybeSingle();
 
-      if (!product) continue;
+        if (!product) continue;
 
-      if (product.status !== "active") {
-        return Response.json(
-          { ok: false, error: `${item.name} is not available.` },
-          { status: 400 }
-        );
-      }
+        if (product.status !== "active") {
+          return Response.json(
+            { ok: false, error: `${item.name} is not available.` },
+            { status: 400 }
+          );
+        }
 
-      if (product.stock < item.quantity) {
-        return Response.json(
-          {
-            ok: false,
-            error: `Not enough stock for ${item.name}. Available: ${product.stock}.`,
-          },
-          { status: 400 }
-        );
+        if (product.stock < item.quantity) {
+          return Response.json(
+            {
+              ok: false,
+              error: `Not enough stock for ${item.name}. Available: ${product.stock}.`,
+            },
+            { status: 400 }
+          );
+        }
+      } catch {
+        // products table doesn't exist — skip validation
       }
     }
 
@@ -131,21 +135,25 @@ export async function POST(request: Request) {
     }
 
     for (const item of payload.items) {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock")
-        .eq("id", item.productId)
-        .maybeSingle();
+      try {
+        const { data: product } = await supabase
+          .from("products")
+          .select("stock")
+          .eq("id", item.productId)
+          .maybeSingle();
 
-      if (!product) continue;
+        if (!product) continue;
 
-      await supabase
-        .from("products")
-        .update({
-          stock: Math.max(0, product.stock - item.quantity),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", item.productId);
+        await supabase
+          .from("products")
+          .update({
+            stock: Math.max(0, product.stock - item.quantity),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", item.productId);
+      } catch {
+        // products table doesn't exist — skip stock update
+      }
     }
 
     await supabase

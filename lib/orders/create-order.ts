@@ -22,29 +22,33 @@ export async function createMockOrder(
   );
 
   for (const item of payload.items) {
-    const { data: product, error } = await supabase
-      .from("products")
-      .select("stock, name, status")
-      .eq("id", item.productId)
-      .maybeSingle();
+    try {
+      const { data: product, error } = await supabase
+        .from("products")
+        .select("stock, name, status")
+        .eq("id", item.productId)
+        .maybeSingle();
 
-    if (error) {
-      return { ok: false, error: error.message };
-    }
+      if (error) {
+        return { ok: false, error: error.message };
+      }
 
-    if (!product) {
-      continue;
-    }
+      if (!product) {
+        continue;
+      }
 
-    if (product.status !== "active") {
-      return { ok: false, error: `${item.name} is not available.` };
-    }
+      if (product.status !== "active") {
+        return { ok: false, error: `${item.name} is not available.` };
+      }
 
-    if (product.stock < item.quantity) {
-      return {
-        ok: false,
-        error: `Not enough stock for ${item.name}. Available: ${product.stock}.`
-      };
+      if (product.stock < item.quantity) {
+        return {
+          ok: false,
+          error: `Not enough stock for ${item.name}. Available: ${product.stock}.`
+        };
+      }
+    } catch {
+      // products table doesn't exist — skip validation
     }
   }
 
@@ -91,23 +95,27 @@ export async function createMockOrder(
   }
 
   for (const item of payload.items) {
-    const { data: product } = await supabase
-      .from("products")
-      .select("stock")
-      .eq("id", item.productId)
-      .maybeSingle();
+    try {
+      const { data: product } = await supabase
+        .from("products")
+        .select("stock")
+        .eq("id", item.productId)
+        .maybeSingle();
 
-    if (!product) {
-      continue;
+      if (!product) {
+        continue;
+      }
+
+      await supabase
+        .from("products")
+        .update({
+          stock: Math.max(0, product.stock - item.quantity),
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", item.productId);
+    } catch {
+      // products table doesn't exist — skip stock update
     }
-
-    await supabase
-      .from("products")
-      .update({
-        stock: Math.max(0, product.stock - item.quantity),
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", item.productId);
   }
 
   return { ok: true, orderId: order.id };
