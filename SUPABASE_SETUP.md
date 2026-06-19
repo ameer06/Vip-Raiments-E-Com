@@ -95,27 +95,12 @@ This adds 10 sample products for testing.
    NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
    SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
-   NEXT_PUBLIC_RAZORPAY_KEY_ID=razorpay_key_id
-   RAZORPAY_KEY_SECRET=razorpay_secret_key
    ```
 
 5. Click **Save**
 6. Vercel will automatically redeploy with new env vars
 
-## Step 8: Add Razorpay Credentials (Optional)
-
-If you want to use real Razorpay payments:
-
-1. Go to [razorpay.com](https://razorpay.com)
-2. Create account → Sign in
-3. Go to **Settings → API Keys**
-4. Copy:
-   - **Key ID** → `NEXT_PUBLIC_RAZORPAY_KEY_ID`
-   - **Key Secret** → `RAZORPAY_KEY_SECRET`
-
-5. Add to Vercel environment variables (see Step 7)
-
-## Step 9: Test the Setup
+## Step 8: Test the Setup
 
 1. Go to https://vip-raiments.vercel.app
 2. Add products to cart
@@ -160,5 +145,5 @@ Once setup is complete:
 
 For issues:
 - Check Supabase docs: https://supabase.com/docs
-- Check Razorpay docs: https://razorpay.com/docs
+- Check UPI apps: Google Pay, PhonePe, Paytm
 - Check Next.js docs: https://nextjs.org/docs

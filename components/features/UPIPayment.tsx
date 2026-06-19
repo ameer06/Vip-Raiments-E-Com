@@ -139,9 +139,8 @@ export function UPIPayment({
       setUpiLink(data.upiLink);
       setTxnId(data.txnId);
 
-      window.location.href = data.upiLink;
       startPolling(data.txnId);
-      setTimeout(() => setShowQr(true), 3000);
+      setShowQr(true);
     } catch {
       setError("Failed to connect. Please try again.");
       setStep("idle");
@@ -170,13 +169,13 @@ export function UPIPayment({
         </div>
         <p className="text-center text-sm font-bold">
           {step === "linking"
-            ? "Opening your UPI app…"
+            ? "Scan the QR code to pay"
             : "Confirming payment…"}
         </p>
         {step === "linking" && showQr && upiLink && (
           <div className="grid gap-3">
             <p className="text-center text-xs font-semibold text-ink/60">
-              Or scan with your phone
+              Scan with your phone to pay
             </p>
             <div className="flex justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -186,15 +185,22 @@ export function UPIPayment({
                 className="h-48 w-48 rounded-control border border-ink/10"
               />
             </div>
+            <button
+              type="button"
+              onClick={handleManualConfirm}
+              disabled={isSubmitting}
+              className="h-11 w-full rounded-control bg-emerald-600 px-5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            >
+              I&apos;ve completed the payment
+            </button>
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="text-center text-xs font-medium text-ink/50 underline"
+            >
+              Cancel and retry
+            </button>
           </div>
-        )}
-        {upiLink && (
-          <a
-            href={upiLink}
-            className="text-center text-xs font-semibold text-ink underline"
-          >
-            Tap to open UPI app again
-          </a>
         )}
       </div>
     );

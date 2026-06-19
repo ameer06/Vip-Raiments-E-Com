@@ -123,22 +123,12 @@ console.log(process.env.SUPABASE_SERVICE_ROLE_KEY)
 - Check: Vercel Settings → Environment Variables → Environments dropdown
 
 ### Test Payment fails
-- **Fix:** Make sure RAZORPAY_KEY_SECRET is for TEST mode
-- Production: Use `rzp_live_` keys
-- Testing: Use `rzp_test_` keys
+- **Fix:** Ensure `NEXT_PUBLIC_MERCHANT_UPI_ID` is set correctly in production
 
 ## Testing Variables
 
 After deployment, test endpoints:
 
 ```bash
-# Test Supabase connection
 curl https://vip-raiments.vercel.app/api/admin/products
-
-# Test Razorpay configuration (safe, no payment)
-curl -X POST https://vip-raiments.vercel.app/api/payments/razorpay/order \
-  -H "Content-Type: application/json" \
-  -d '{"cartItems":[],"email":"test@example.com","customerName":"Test"}'
 ```
-
-Both should return valid JSON responses (may have validation errors, but no "undefined" or "not configured" messages).

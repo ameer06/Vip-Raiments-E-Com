@@ -2,17 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 import { formatInr } from "@/lib/utils";
 import { UPIPayment } from "@/components/features/UPIPayment";
 
-const MERCHANT_UPI_ID = process.env.NEXT_PUBLIC_MERCHANT_UPI_ID;
-const hasUPI = MERCHANT_UPI_ID && !MERCHANT_UPI_ID.startsWith("your-");
-
 export function CheckoutForm() {
-  const router = useRouter();
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -54,42 +49,11 @@ export function CheckoutForm() {
     );
   }
 
-  async function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
     setFormErrors({});
-
-    if (!validateForm()) {
-      setIsSubmitting(false);
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    if (hasUPI) {
-      setIsSubmitting(false);
-      return;
-    }
-
-    const response = await fetch("/api/checkout/mock", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        items
-      })
-    });
-
-    const data = await response.json();
-    setIsSubmitting(false);
-
-    if (!response.ok) {
-      setError(data.error ?? "Checkout failed.");
-      return;
-    }
-
-    clearCart();
-    router.push(`/order/${data.orderId}`);
+    validateForm();
   }
 
   return (
@@ -144,20 +108,10 @@ export function CheckoutForm() {
       </div>
 
       <aside className="h-fit rounded-card border border-ink/10 bg-white p-card-pad shadow-card lg:sticky lg:top-24">
-        <h2 className="text-xl font-semibold sm:text-2xl">
-          {hasUPI ? "Pay with UPI" : "Payment (mock)"}
-        </h2>
-        {hasUPI ? (
-          <p className="mt-3 text-sm text-ink/50">
-            Pay via Google Pay, PhonePe, Paytm, or any UPI app. No card details needed.
-          </p>
-        ) : (
-          <p className="mt-3 text-sm text-ink/50">
-            No real charge. Click pay to simulate a successful payment and create
-            an order in Supabase. Set{" "}
-            <code className="bg-surface px-1">NEXT_PUBLIC_MERCHANT_UPI_ID</code> to enable UPI payments.
-          </p>
-        )}
+        <h2 className="text-xl font-semibold sm:text-2xl">Pay with UPI</h2>
+        <p className="mt-3 text-sm text-ink/50">
+          Pay via Google Pay, PhonePe, Paytm, or any UPI app. No card details needed.
+        </p>
         <div className="mt-5 flex items-center justify-between gap-4 sm:mt-6">
           <p className="text-sm font-medium">Total</p>
           <p className="text-xl font-semibold sm:text-2xl">{formatInr(subtotal)}</p>
@@ -179,25 +133,15 @@ export function CheckoutForm() {
             {error}
           </p>
         ) : null}
-        {hasUPI ? (
-          <div className="mt-5 sm:mt-6">
-            <UPIPayment
-              form={form}
-              isSubmitting={isSubmitting}
-              setIsSubmitting={setIsSubmitting}
-              setError={setError}
-              validate={validateForm}
-            />
-          </div>
-        ) : (
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-control bg-ink text-sm font-semibold text-white disabled:opacity-60 sm:mt-6"
-          >
-            {isSubmitting ? "Processing…" : "Pay with mock gateway"}
-          </button>
-        )}
+        <div className="mt-5 sm:mt-6">
+          <UPIPayment
+            form={form}
+            isSubmitting={isSubmitting}
+            setIsSubmitting={setIsSubmitting}
+            setError={setError}
+            validate={validateForm}
+          />
+        </div>
       </aside>
     </form>
   );

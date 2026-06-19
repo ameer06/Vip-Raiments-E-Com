@@ -68,11 +68,11 @@ on public.orders for insert
 to anon, authenticated
 with check (true);
 
-drop policy if exists "Anyone can read own orders by id" on public.orders;
-create policy "Anyone can read orders"
+drop policy if exists "Anyone can read orders" on public.orders;
+create policy "Admin users can read orders"
 on public.orders for select
-to anon, authenticated
-using (true);
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()));
 
 drop policy if exists "Anyone can insert order items" on public.order_items;
 create policy "Anyone can insert order items"
@@ -81,10 +81,10 @@ to anon, authenticated
 with check (true);
 
 drop policy if exists "Anyone can read order items" on public.order_items;
-create policy "Anyone can read order items"
+create policy "Admin users can read order items"
 on public.order_items for select
-to anon, authenticated
-using (true);
+to authenticated
+using (exists (select 1 from public.admin_users where user_id = auth.uid()));
 
 -- Admin users can read/insert/update all products (used when SUPABASE_SERVICE_ROLE_KEY is not set)
 drop policy if exists "Admin users can read all products" on public.products;

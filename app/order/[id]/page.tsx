@@ -29,7 +29,7 @@ export default async function OrderConfirmationPage({ params }: OrderPageProps) 
         Thank you, {order.customer_name}
       </h1>
       <p className="mt-3 text-sm text-ink/60 sm:mt-4">
-        Mock payment succeeded. A confirmation was sent to {order.email}.
+        Payment received. A confirmation was sent to {order.email}.
       </p>
 
       <div className="mt-6 rounded-card border border-ink/10 bg-white p-card-pad shadow-card sm:mt-8">

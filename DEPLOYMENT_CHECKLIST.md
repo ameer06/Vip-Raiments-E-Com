@@ -191,7 +191,7 @@ Weekly backups are critical:
 
 - **Supabase Docs:** https://supabase.com/docs
 - **Next.js Docs:** https://nextjs.org/docs
-- **Razorpay Docs:** https://razorpay.com/docs
+- **UPI Apps:** Google Pay, PhonePe, Paytm
 - **Vercel Docs:** https://vercel.com/docs
 
 ---
@@ -204,7 +204,7 @@ Project is ready for production when:
 - ✅ Supabase tables created and populated
 - ✅ Environment variables configured
 - ✅ Admin account created and tested
-- ✅ Payment integration working (mock or real)
+- ✅ UPI payment integration working with QR code
 - ✅ Images loading from Storage/CDN
 - ✅ No errors in logs
 - ✅ Performance under 3 seconds for LCP

@@ -279,7 +279,7 @@ export function AdminDashboardClient() {
         </div>
         {orders.length === 0 ? (
           <p className="p-card-pad text-sm text-ink/50">
-            No orders yet. Complete a mock checkout to create one (requires Supabase tables).
+            No orders yet. Complete a checkout to create one.
           </p>
         ) : (
           <div className="overflow-x-auto">

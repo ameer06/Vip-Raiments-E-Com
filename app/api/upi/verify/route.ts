@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient, hasSupabaseServiceRole } from "@/lib/supabase/admin";
 
 interface VerifyRequest {
   txnId: string;
@@ -34,16 +35,22 @@ export async function POST(request: Request) {
       return Response.json({ ok: true, status: intent.status });
     }
 
-    const { data: order } = await supabase
-      .from("orders")
-      .select("id")
-      .eq("payment_reference", body.txnId)
-      .single();
+    let orderId: string | undefined;
+
+    if (hasSupabaseServiceRole()) {
+      const adminClient = createSupabaseAdminClient();
+      const { data: order } = await adminClient
+        .from("orders")
+        .select("id")
+        .eq("payment_reference", body.txnId)
+        .maybeSingle();
+      orderId = order?.id;
+    }
 
     return Response.json({
       ok: true,
       status: "paid",
-      orderId: order?.id,
+      orderId,
     });
   } catch (error) {
     console.error("UPI verify error:", error);
