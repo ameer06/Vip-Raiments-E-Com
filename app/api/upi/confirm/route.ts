@@ -99,6 +99,7 @@ export async function POST(request: Request) {
         total_inr: totalInr,
         payment_provider: "upi",
         payment_reference: txnId,
+        updated_at: new Date().toISOString(),
       })
       .select("id")
       .single();
@@ -163,6 +164,45 @@ export async function POST(request: Request) {
         confirmed_at: new Date().toISOString(),
       })
       .eq("txn_id", txnId);
+
+    // Create initial status history entry
+    await supabase.from("order_status_history").insert({
+      order_id: order.id,
+      status: "paid",
+      note: "Payment confirmed via UPI",
+    });
+
+    // Send order confirmation email (non-blocking)
+    const orderData = {
+      id: order.id,
+      email: payload.email,
+      customer_name: payload.customerName,
+      phone: payload.phone || null,
+      address_line: payload.addressLine,
+      city: payload.city,
+      postal_code: payload.postalCode,
+      status: "paid" as const,
+      total_inr: totalInr,
+      payment_provider: "upi",
+      payment_reference: txnId,
+      notes: null,
+      tracking_number: null,
+      shipping_carrier: null,
+      estimated_delivery: null,
+      delivered_at: null,
+      cancelled_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    const itemsData = orderItems.map((item, i) => ({
+      id: `item_${i}`,
+      ...item,
+    }));
+    import("@/lib/email/send").then(({ sendOrderConfirmation }) =>
+      sendOrderConfirmation(orderData, itemsData).catch((err) =>
+        console.error("Order confirmation email failed:", err)
+      )
+    );
 
     return Response.json({
       ok: true,

@@ -64,19 +64,8 @@ const emptyProduct = (): Product => ({
   images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80", "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80"]
 });
 
-type OrderRow = {
-  id: string;
-  email: string;
-  customer_name: string;
-  status: string;
-  total_inr: number;
-  created_at: string;
-  order_items?: { product_name: string; quantity: number }[];
-};
-
 export function AdminDashboardClient() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [orders, setOrders] = useState<OrderRow[]>([]);
   const [draft, setDraft] = useState<Product>(emptyProduct());
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -85,21 +74,13 @@ export function AdminDashboardClient() {
 
   useEffect(() => {
     async function load() {
-      const [productsRes, ordersRes] = await Promise.all([
-        fetch("/api/admin/products"),
-        fetch("/api/admin/orders")
-      ]);
+      const productsRes = await fetch("/api/admin/products");
 
       if (productsRes.ok) {
         const data = await productsRes.json();
         const apiProducts = data.products ?? [];
         const overrides = loadOverrides();
         setProducts(applyOverrides(apiProducts, overrides));
-      }
-
-      if (ordersRes.ok) {
-        const data = await ordersRes.json();
-        setOrders(data.orders ?? []);
       }
 
       setLoading(false);
@@ -271,51 +252,6 @@ export function AdminDashboardClient() {
             </table>
           </div>
         </div>
-      </div>
-
-      <div className="mt-section overflow-hidden rounded-card border border-ink/10 bg-white shadow-card">
-        <div className="border-b border-ink/10 p-card-pad">
-          <h2 className="text-xl font-semibold">Recent orders</h2>
-        </div>
-        {orders.length === 0 ? (
-          <p className="p-card-pad text-sm text-ink/50">
-            No orders yet. Complete a checkout to create one.
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="bg-surface text-xs font-semibold uppercase tracking-wider">
-                <tr>
-                  <th className="border-b border-ink/10 p-4">Order</th>
-                  <th className="border-b border-ink/10 p-4">Customer</th>
-                  <th className="border-b border-ink/10 p-4">Total</th>
-                  <th className="border-b border-ink/10 p-4">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id} className="font-medium">
-                    <td className="border-b border-ink/10 p-4 font-mono text-xs">
-                      {order.id.slice(0, 8)}…
-                    </td>
-                    <td className="border-b border-ink/10 p-4">
-                      {order.customer_name}
-                      <span className="block text-xs text-ink/50">
-                        {order.email}
-                      </span>
-                    </td>
-                    <td className="border-b border-ink/10 p-4">
-                      {formatInr(order.total_inr)}
-                    </td>
-                    <td className="border-b border-ink/10 p-4">
-                      {order.status}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
     </>
   );

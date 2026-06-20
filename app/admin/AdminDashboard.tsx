@@ -1,5 +1,5 @@
 import { PackageCheck, PencilLine, Upload, IndianRupee } from "lucide-react";
-import { AdminDashboardClient } from "@/components/admin/AdminDashboardClient";
+import { AdminTabs } from "@/components/admin/AdminTabs";
 
 const steps = [
   {
@@ -20,7 +20,7 @@ const steps = [
   {
     icon: PackageCheck,
     title: "Orders",
-    body: "Mock checkouts appear in Recent orders when Supabase orders tables are set up."
+    body: "Track and manage customer orders. Update statuses, add tracking numbers, and export to CSV."
   }
 ];
 
@@ -35,8 +35,7 @@ export function AdminDashboard() {
           Store management
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink/60 sm:text-base">
-          Manage products, inventory, and view orders. Run supabase/schema.sql in
-          your Supabase project if tables are missing.
+          Manage products, inventory, orders, and customer communications.
         </p>
       </div>
 
@@ -62,7 +61,7 @@ export function AdminDashboard() {
         })}
       </div>
 
-      <AdminDashboardClient />
+      <AdminTabs />
     </section>
   );
 }
