@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { createSupabaseAdminClient, hasSupabaseServiceRole } from "@/lib/supabase/admin";
-import { sendStatusUpdate } from "@/lib/email/send";
-import type { OrderStatus, VALID_STATUS_TRANSITIONS } from "@/lib/orders/types";
+import type { OrderStatus } from "@/lib/orders/types";
 import { VALID_STATUS_TRANSITIONS as VALID_TRANSITIONS } from "@/lib/orders/types";
 
 interface UpdateStatusRequest {
@@ -88,18 +87,6 @@ export async function POST(request: Request) {
     note: body.note || null,
     created_by: admin.user.id,
   });
-
-  const { data: items } = await supabase
-    .from("order_items")
-    .select("*")
-    .eq("order_id", body.orderId);
-
-  const updatedOrder = { ...order, ...updates };
-  if (items && items.length > 0) {
-    sendStatusUpdate(updatedOrder as never, items as never, currentStatus, body.note).catch(
-      (err) => console.error("Failed to send status email:", err)
-    );
-  }
 
   return NextResponse.json({ ok: true });
 }
