@@ -5,6 +5,7 @@ import { Menu, ShoppingBag, UserRound, X } from "lucide-react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useCart } from "@/hooks/useCart";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -15,6 +16,7 @@ const navItems = [
 
 export function Header() {
   const { count, hydrated } = useCart();
+  const { session } = useSupabaseSession();
   const { scrollY } = useScroll();
   const [isPinned, setIsPinned] = useState(true);
   const [lastY, setLastY] = useState(0);
@@ -75,7 +77,12 @@ export function Header() {
 
           <div className="flex shrink-0 items-center gap-2">
             <IconLink href="/account" label="Account" className="hidden sm:grid">
-              <UserRound className="h-4 w-4" />
+              <span className="relative">
+                <UserRound className="h-4 w-4" />
+                {session && (
+                  <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-green-500" />
+                )}
+              </span>
             </IconLink>
             <IconLink href="/cart" label="Cart" className="relative">
               <ShoppingBag className="h-4 w-4" />
@@ -134,8 +141,13 @@ export function Header() {
                   onClick={() => setIsMenuOpen(false)}
                   className="flex items-center gap-3 py-3 text-sm font-medium text-ink/60 hover:text-ink"
                 >
-                  <UserRound className="h-4 w-4" />
-                  Account
+                  <span className="relative">
+                    <UserRound className="h-4 w-4" />
+                    {session && (
+                      <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-green-500" />
+                    )}
+                  </span>
+                  {session ? "My Account" : "Account"}
                 </Link>
                 <Link
                   href="/cart"

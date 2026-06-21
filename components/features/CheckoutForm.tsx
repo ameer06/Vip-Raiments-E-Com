@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatInr } from "@/lib/utils";
 import { UPIPayment } from "@/components/features/UPIPayment";
 
 export function CheckoutForm() {
   const { items, subtotal } = useCart();
+  const { session } = useSupabaseSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -19,6 +22,28 @@ export function CheckoutForm() {
     city: "",
     postalCode: ""
   });
+
+  useEffect(() => {
+    if (!session?.user) return;
+    const supabase = createSupabaseBrowserClient();
+    supabase
+      .from("customer_profiles")
+      .select("full_name, phone, default_address")
+      .eq("id", session.user.id)
+      .single()
+      .then(({ data }) => {
+        if (!data) return;
+        setForm((prev) => ({
+          ...prev,
+          email: session.user?.email ?? prev.email,
+          customerName: data.full_name ?? prev.customerName,
+          phone: data.phone ?? prev.phone,
+          addressLine: data.default_address?.addressLine ?? prev.addressLine,
+          city: data.default_address?.city ?? prev.city,
+          postalCode: data.default_address?.postalCode ?? prev.postalCode
+        }));
+      });
+  }, [session]);
 
   function validateForm(): boolean {
     const errs: Record<string, string> = {};
