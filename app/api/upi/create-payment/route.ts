@@ -1,35 +1,16 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { CartLineItem } from "@/lib/cart/types";
-
-interface CreateUPIRequest {
-  amount: number;
-  orderRef: string;
-  customerName: string;
-  email: string;
-  phone?: string;
-  addressLine: string;
-  city: string;
-  postalCode: string;
-  items: CartLineItem[];
-}
+import { validateCheckoutPayload } from "@/lib/validation";
 
 export async function POST(request: Request) {
   try {
-    const body: CreateUPIRequest = await request.json();
+    const body = await request.json();
+    const result = validateCheckoutPayload(body);
 
-    if (!body.amount || !body.orderRef || !body.customerName || !body.email) {
-      return Response.json(
-        { ok: false, error: "Missing required fields" },
-        { status: 400 }
-      );
+    if (!result.ok) {
+      return Response.json({ ok: false, error: result.error }, { status: 400 });
     }
 
-    if (body.amount <= 0) {
-      return Response.json(
-        { ok: false, error: "Invalid amount" },
-        { status: 400 }
-      );
-    }
+    const { sanitized } = result;
 
     const upiId = process.env.NEXT_PUBLIC_MERCHANT_UPI_ID || process.env.MERCHANT_UPI_ID;
     if (!upiId) {
@@ -41,32 +22,30 @@ export async function POST(request: Request) {
 
     const txnId = `TXN${Date.now()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     const merchantName = "VIP Raiments";
-    const amountStr = body.amount.toFixed(2);
+    const amountStr = sanitized.amount.toFixed(2);
 
-    const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amountStr}&tr=${txnId}&tn=${encodeURIComponent(`Payment for ${body.orderRef}`)}&cu=INR`;
+    const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amountStr}&tr=${txnId}&tn=${encodeURIComponent(`Payment for ${sanitized.orderRef}`)}&cu=INR`;
 
     const supabase = await createSupabaseServerClient();
 
-    const checkoutPayload = {
-      email: body.email,
-      customerName: body.customerName,
-      phone: body.phone || null,
-      addressLine: body.addressLine,
-      city: body.city,
-      postalCode: body.postalCode,
-      items: body.items,
-    };
-
     const { error: insertError } = await supabase.from("payment_intents").insert({
       txn_id: txnId,
-      order_ref: body.orderRef,
-      amount: Math.round(body.amount),
+      order_ref: sanitized.orderRef,
+      amount: sanitized.amount,
       status: "pending",
-      customer_email: body.email,
-      customer_name: body.customerName,
-      customer_phone: body.phone || null,
+      customer_email: sanitized.email,
+      customer_name: sanitized.customerName,
+      customer_phone: sanitized.phone || null,
       upi_link: upiLink,
-      checkout_payload: checkoutPayload,
+      checkout_payload: {
+        email: sanitized.email,
+        customerName: sanitized.customerName,
+        phone: sanitized.phone || null,
+        addressLine: sanitized.addressLine,
+        city: sanitized.city,
+        postalCode: sanitized.postalCode,
+        items: sanitized.items,
+      },
     });
 
     if (insertError) {
@@ -82,7 +61,7 @@ export async function POST(request: Request) {
       txnId,
       upiLink,
       merchantName,
-      amount: body.amount,
+      amount: sanitized.amount,
     });
   } catch (error) {
     console.error("UPI payment creation error:", error);

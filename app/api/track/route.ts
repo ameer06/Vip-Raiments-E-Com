@@ -1,14 +1,31 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient, hasSupabaseServiceRole } from "@/lib/supabase/admin";
+import { sanitizeInput, isValidEmail } from "@/lib/validation";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const orderId = url.searchParams.get("orderId");
-  const email = url.searchParams.get("email");
+  const rawOrderId = url.searchParams.get("orderId");
+  const rawEmail = url.searchParams.get("email");
 
-  if (!orderId && !email) {
+  if (!rawOrderId && !rawEmail) {
     return NextResponse.json({ error: "orderId or email required" }, { status: 400 });
   }
+
+  if (rawOrderId && typeof rawOrderId === "string") {
+    const orderId = sanitizeInput(rawOrderId, 100);
+    if (orderId.length < 3) {
+      return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
+    }
+  }
+
+  if (rawEmail && typeof rawEmail === "string") {
+    if (!isValidEmail(rawEmail)) {
+      return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+    }
+  }
+
+  const orderId = rawOrderId ? sanitizeInput(rawOrderId, 100) : null;
+  const email = rawEmail ? sanitizeInput(rawEmail, 254) : null;
 
   if (!hasSupabaseServiceRole()) {
     return NextResponse.json({ error: "Service not configured" }, { status: 500 });

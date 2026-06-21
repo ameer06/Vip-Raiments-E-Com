@@ -1,12 +1,21 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { sanitizeInput } from "@/lib/validation";
 import type { CartLineItem } from "@/lib/cart/types";
 
 export async function POST(request: Request) {
   try {
-    const { txnId } = await request.json();
-    if (!txnId) {
+    const { txnId: rawTxnId } = await request.json();
+    if (!rawTxnId || typeof rawTxnId !== "string") {
       return Response.json(
         { ok: false, error: "Missing transaction ID" },
+        { status: 400 }
+      );
+    }
+
+    const txnId = sanitizeInput(rawTxnId, 100);
+    if (!/^TXN\d{13,}[A-Z0-9]{4,}$/.test(txnId)) {
+      return Response.json(
+        { ok: false, error: "Invalid transaction ID format" },
         { status: 400 }
       );
     }
