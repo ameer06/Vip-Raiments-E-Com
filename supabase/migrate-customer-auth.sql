@@ -63,7 +63,7 @@ CREATE POLICY "Users can view own order items"
       SELECT 1 FROM public.orders
       WHERE orders.id = order_items.order_id
         AND (
-          orders.customer_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+          orders.email = (SELECT email FROM auth.users WHERE id = auth.uid())
           OR EXISTS (SELECT 1 FROM public.admin_users WHERE user_id = auth.uid())
         )
     )
