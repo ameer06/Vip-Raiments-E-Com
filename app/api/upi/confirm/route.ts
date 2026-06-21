@@ -1,9 +1,13 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { sanitizeInput } from "@/lib/validation";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import type { CartLineItem } from "@/lib/cart/types";
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
+    const rl = checkRateLimit(`upi-confirm:${ip}`, 10, 60_000);
+    if (!rl.allowed) return rateLimitResponse(rl.retryAfterMs);
     const { txnId: rawTxnId } = await request.json();
     if (!rawTxnId || typeof rawTxnId !== "string") {
       return Response.json(

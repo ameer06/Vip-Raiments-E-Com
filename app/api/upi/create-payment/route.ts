@@ -1,8 +1,12 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { validateCheckoutPayload } from "@/lib/validation";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
+    const rl = checkRateLimit(`upi-create:${ip}`, 10, 60_000);
+    if (!rl.allowed) return rateLimitResponse(rl.retryAfterMs);
     const body = await request.json();
     const result = validateCheckoutPayload(body);
 
