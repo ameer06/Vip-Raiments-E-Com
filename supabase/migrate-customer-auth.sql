@@ -46,7 +46,7 @@ END $$;
 CREATE POLICY "Users can view orders by email"
   ON public.orders FOR SELECT
   USING (
-    customer_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+    email = (SELECT email FROM auth.users WHERE id = auth.uid())
     OR EXISTS (SELECT 1 FROM public.admin_users WHERE user_id = auth.uid())
   );
 

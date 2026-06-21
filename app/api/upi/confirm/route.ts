@@ -57,32 +57,22 @@ export async function POST(request: Request) {
 
     for (const item of payload.items) {
       try {
-        const { data: product } = await supabase
-          .from("products")
-          .select("stock, status")
-          .eq("id", item.productId)
-          .maybeSingle();
+        const { data: deducted } = await supabase.rpc("deduct_stock", {
+          p_product_id: item.productId,
+          p_quantity: item.quantity,
+        });
 
-        if (!product) continue;
-
-        if (product.status !== "active") {
-          return Response.json(
-            { ok: false, error: `${item.name} is not available.` },
-            { status: 400 }
-          );
-        }
-
-        if (product.stock < item.quantity) {
+        if (deducted === false) {
           return Response.json(
             {
               ok: false,
-              error: `Not enough stock for ${item.name}. Available: ${product.stock}.`,
+              error: `Not enough stock for ${item.name}.`,
             },
             { status: 400 }
           );
         }
       } catch {
-        // products table doesn't exist — skip validation
+        // products table doesn't exist — skip stock update
       }
     }
 
@@ -133,28 +123,6 @@ export async function POST(request: Request) {
         { ok: false, error: itemsError.message },
         { status: 500 }
       );
-    }
-
-    for (const item of payload.items) {
-      try {
-        const { data: product } = await supabase
-          .from("products")
-          .select("stock")
-          .eq("id", item.productId)
-          .maybeSingle();
-
-        if (!product) continue;
-
-        await supabase
-          .from("products")
-          .update({
-            stock: Math.max(0, product.stock - item.quantity),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", item.productId);
-      } catch {
-        // products table doesn't exist — skip stock update
-      }
     }
 
     await supabase

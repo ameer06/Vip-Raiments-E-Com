@@ -11,7 +11,7 @@ type Order = {
   status: string;
   total: number;
   created_at: string;
-  items: { name: string; quantity: number }[];
+  items: { product_name: string; quantity: number }[];
 };
 
 const statusColors: Record<string, string> = {
@@ -53,8 +53,8 @@ export function CustomerOrdersList() {
 
       const { data, error: fetchError } = await supabase
         .from("orders")
-        .select("id, status, total, created_at, order_items(name, quantity)")
-        .eq("customer_email", user.email)
+        .select("id, status, total_inr, created_at, order_items(product_name, quantity)")
+        .eq("email", user.email)
         .order("created_at", { ascending: false });
 
       if (fetchError) {
@@ -67,9 +67,9 @@ export function CustomerOrdersList() {
         (data ?? []).map((o) => ({
           id: o.id,
           status: o.status,
-          total: o.total,
+          total: o.total_inr,
           created_at: o.created_at,
-          items: (o.order_items as unknown as { name: string; quantity: number }[]) ?? []
+          items: (o.order_items as unknown as { product_name: string; quantity: number }[]) ?? []
         }))
       );
       setIsLoading(false);
@@ -134,7 +134,7 @@ export function CustomerOrdersList() {
               </span>
             </div>
             <p className="mt-1 truncate text-sm text-ink/50">
-              {order.items.map((i) => `${i.quantity}x ${i.name}`).join(", ") ||
+              {order.items.map((i) => `${i.quantity}x ${i.product_name}`).join(", ") ||
                 "Order items"}
             </p>
             <p className="mt-0.5 text-xs text-ink/40">
