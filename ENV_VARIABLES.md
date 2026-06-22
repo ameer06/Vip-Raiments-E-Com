@@ -12,9 +12,8 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-# Razorpay Configuration
-NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxxxxx
-RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
+# UPI Payment
+NEXT_PUBLIC_MERCHANT_UPI_ID=yourname@okaxis
 ```
 
 ⚠️ **Never commit .env.local to Git!** It's in .gitignore automatically.
@@ -55,19 +54,21 @@ RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
 - **⚠️ Important:** This is a secret! Never expose to frontend
 - **Click:** Save
 
-#### Variable 4 (Optional): NEXT_PUBLIC_RAZORPAY_KEY_ID
-- **Name:** `NEXT_PUBLIC_RAZORPAY_KEY_ID`
-- **Value:** `rzp_live_xxxxxxxxxxxxxxxx` (from Razorpay)
-- **Environments:** Production only (use rzp_test_ for Preview)
+#### Variable 4: NEXT_PUBLIC_MERCHANT_UPI_ID
+- **Name:** `NEXT_PUBLIC_MERCHANT_UPI_ID`
+- **Value:** `yourname@okaxis`
+- **Environments:** Production, Preview, Development
 - **Click:** Save
 
-#### Variable 5 (Optional): RAZORPAY_KEY_SECRET
-- **Name:** `RAZORPAY_KEY_SECRET`
-- **Value:** Paste from Razorpay dashboard
-- **Environments:** Production only
-- **Click:** Save
+### Step 3: Supabase Auth Configuration
 
-### Step 3: Trigger Redeploy
+1. Go to **Supabase Dashboard → Authentication → URL Configuration**
+2. Set **Site URL** to: `https://vip-raiments.vercel.app`
+3. Under **Redirect URLs**, add: `https://vip-raiments.vercel.app`
+4. Go to **Project Settings → Email** → change **Sender name** to `VIP Raiments`
+5. Click **Save**
+
+### Step 4: Trigger Redeploy
 
 After adding all environment variables:
 
@@ -103,8 +104,7 @@ console.log(process.env.SUPABASE_SERVICE_ROLE_KEY)
 | `NEXT_PUBLIC_SUPABASE_URL` | ✅ Yes | Browser, API | https://abc.supabase.co |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ Yes | Browser, API | eyJ... (starts with ey) |
 | `SUPABASE_SERVICE_ROLE_KEY` | ❌ Secret | API only | eyJ... (starts with ey) |
-| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | ✅ Yes | Browser, API | rzp_live_xxx |
-| `RAZORPAY_KEY_SECRET` | ❌ Secret | API only | secret_xxx |
+| `NEXT_PUBLIC_MERCHANT_UPI_ID` | ✅ Yes | Browser, API | yourname@okaxis |
 
 **Rule:** Never prefix secrets with `NEXT_PUBLIC_`!
 
@@ -122,8 +122,17 @@ console.log(process.env.SUPABASE_SERVICE_ROLE_KEY)
 - **Fix:** Make sure variables are set for Preview environment
 - Check: Vercel Settings → Environment Variables → Environments dropdown
 
-### Test Payment fails
-- **Fix:** Ensure `NEXT_PUBLIC_MERCHANT_UPI_ID` is set correctly in production
+### Confirmation email shows "Supabase" as sender
+- **Fix:** Go to Supabase → Project Settings → Email → change Sender name to `VIP Raiments`
+
+### Confirmation link shows "This site can't be reached"
+- **Fix:** Go to Supabase → Authentication → URL Configuration → set Site URL to `https://vip-raiments.vercel.app`
+
+### Customer account creation fails
+- **Fix:** Run `migrate-customer-auth.sql` in Supabase SQL Editor
+
+### Stock goes negative on concurrent orders
+- **Fix:** Run `migrate-atomic-stock.sql` in Supabase SQL Editor
 
 ## Testing Variables
 

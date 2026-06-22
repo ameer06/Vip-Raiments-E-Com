@@ -7,7 +7,6 @@ Complete setup guide for deploying VIP Raiments to production.
 - [ ] GitHub account with repository cloned
 - [ ] Vercel account connected to GitHub
 - [ ] Supabase account created
-- [ ] Razorpay account created (for payments)
 - [ ] Domain name (optional, Vercel provides default)
 
 ---
@@ -19,11 +18,12 @@ Follow **SUPABASE_SETUP.md** for detailed steps:
 - [ ] Step 1: Create Supabase project
 - [ ] Step 2: Get and save API credentials
 - [ ] Step 3: Create database tables (run schema.sql)
-- [ ] Step 4: Seed sample products (run seed-products.sql)
-- [ ] Step 5: Create storage bucket (`product-images`)
-- [ ] Step 6: Create admin user
-- [ ] Step 7: Configure environment variables in Vercel
-- [ ] Step 8: Add Razorpay credentials (optional)
+- [ ] Step 4: Run customer auth migration (migrate-customer-auth.sql)
+- [ ] Step 5: Run atomic stock migration (migrate-atomic-stock.sql)
+- [ ] Step 6: Run order statuses migration (migrate-order-statuses.sql)
+- [ ] Step 7: Create storage bucket (`product-images`)
+- [ ] Step 8: Create admin user
+- [ ] Step 9: Configure environment variables in Vercel
 
 **Test:** Visit https://vip-raiments.vercel.app/admin → Should redirect to login
 
@@ -38,9 +38,13 @@ Follow **ENV_VARIABLES.md** for complete guide:
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`
 
-### Razorpay Keys (Optional for testing)
-- [ ] `NEXT_PUBLIC_RAZORPAY_KEY_ID`
-- [ ] `RAZORPAY_KEY_SECRET`
+### UPI Payment (Required)
+- [ ] `NEXT_PUBLIC_MERCHANT_UPI_ID`
+
+### Supabase Auth Config
+- [ ] Set Site URL to `https://vip-raiments.vercel.app`
+- [ ] Add redirect URL `https://vip-raiments.vercel.app`
+- [ ] Change sender name to `VIP Raiments`
 
 **Location:** Vercel → Project Settings → Environment Variables
 
@@ -57,7 +61,8 @@ Follow **ENV_VARIABLES.md** for complete guide:
 - [ ] Products display (/products)
 - [ ] Product detail page loads (/products/[slug])
 - [ ] Navigation menu works
-- [ ] Search functionality works (if implemented)
+- [ ] Search functionality works (/products?q=keyword)
+- [ ] Sort functionality works (/products?sort=price-low)
 
 **Shopping Flow:**
 - [ ] Add product to cart (verify quantity controls)
@@ -68,24 +73,49 @@ Follow **ENV_VARIABLES.md** for complete guide:
 
 **Checkout:**
 - [ ] Fill shipping form with valid data
-- [ ] Submit form with "Pay with mock gateway"
-- [ ] Mock payment creates order successfully
+- [ ] Submit form with UPI payment
+- [ ] QR code displays correctly
+- [ ] UPI app chooser works on mobile
+- [ ] Payment confirmation creates order
 - [ ] Redirected to order confirmation page
-- [ ] Order details display correctly
+
+**Customer Account:**
+- [ ] Create new account (/account/signup)
+- [ ] Confirm email link works
+- [ ] Sign in (/account/login)
+- [ ] View order history (/account)
+- [ ] Update profile (/account)
+- [ ] Sign out works
+
+**Order Tracking:**
+- [ ] Track by order ID (/track)
+- [ ] Track by email (/track)
+- [ ] Order status displays correctly
+- [ ] Status timeline shows history
 
 **Admin Dashboard:**
 - [ ] Navigate to /admin
 - [ ] Redirected to login (if not authenticated)
 - [ ] Login with admin user
-- [ ] View product inventory table
+- [ ] View product inventory (Products tab)
 - [ ] Edit product details
-- [ ] Upload product images (if Storage bucket set up)
-- [ ] View recent orders
+- [ ] Upload product images
+- [ ] View orders (Orders tab)
+- [ ] Search/filter orders
+- [ ] Update order status
+- [ ] Add tracking number
+- [ ] Export orders to CSV
 
 **Performance:**
 - [ ] Page load time under 3 seconds
 - [ ] Images optimize and load quickly
 - [ ] No console errors (Check browser DevTools)
+- [ ] Skeleton loading states display
+
+**Error Handling:**
+- [ ] 404 page displays (/nonexistent-page)
+- [ ] 500 error page displays
+- [ ] Form validation errors display
 
 ---
 
@@ -112,7 +142,7 @@ Follow **ENV_VARIABLES.md** for complete guide:
 
 ## 🛠️ Common Issues & Fixes
 
-### "Could not find table 'public-products'"
+### "Could not find table 'public.products'"
 **Solution:** Run `supabase/schema.sql` in Supabase SQL Editor
 
 ### Checkout button disabled
@@ -124,10 +154,20 @@ Follow **ENV_VARIABLES.md** for complete guide:
 ### Images not displaying
 **Solution:** Check `NEXT_PUBLIC_SUPABASE_URL` is correct
 
-### Payment failing
-**Solution:** Add RAZORPAY_KEY_SECRET to Vercel (make sure it's NOT public)
+### Customer signup fails
+**Solution:** Run `migrate-customer-auth.sql` in Supabase SQL Editor
 
-See **SUPABASE_SETUP.md** and **ENV_VARIABLES.md** for more details.
+### Stock goes negative
+**Solution:** Run `migrate-atomic-stock.sql` in Supabase SQL Editor
+
+### Order status update fails
+**Solution:** Run `migrate-order-statuses.sql` in Supabase SQL Editor
+
+### Confirmation email shows "Supabase"
+**Solution:** Go to Supabase → Project Settings → Email → change Sender name
+
+### Confirmation link broken
+**Solution:** Go to Supabase → Authentication → URL Configuration → set Site URL
 
 ---
 
@@ -136,36 +176,42 @@ See **SUPABASE_SETUP.md** and **ENV_VARIABLES.md** for more details.
 - **SUPABASE_SETUP.md** - Step-by-step Supabase configuration
 - **ENV_VARIABLES.md** - Environment variables guide
 - **ADMIN_GUIDE.md** - Admin dashboard usage
-- **DEPLOYMENT_GUIDE.md** - Original deployment notes
 - **README.md** - Project overview
 
 ---
 
-## 🎯 Next Steps
+## 🎯 Roadmap
 
-### Immediate (Before Public Launch)
-1. Test all checkout flows with real Razorpay sandbox
-2. Configure email notifications (Supabase Edge Functions)
-3. Set up analytics tracking (Google Analytics/Mixpanel)
-4. Create support documentation for customers
+### Completed ✅
+- [x] Product catalog with search and sort
+- [x] Shopping cart with quantity controls
+- [x] UPI payment with QR code
+- [x] Customer authentication (signup/login)
+- [x] Customer order history
+- [x] Order tracking by ID/email
+- [x] Admin product management
+- [x] Admin order management with status updates
+- [x] Atomic stock deduction
+- [x] Server-side input validation
+- [x] Rate limiting on payment endpoints
+- [x] Skeleton loading states
+- [x] Custom error pages (404, 500)
 
-### Short-term (Week 1-2)
-1. Implement customer login/account page
-2. Add order history viewing for customers
-3. Set up abandoned cart recovery emails
-4. Configure domain name with custom SSL
+### Phase 2 (Next)
+- [ ] Wishlist / Save for later
+- [ ] Product reviews & ratings
+- [ ] Shipping cost display
+- [ ] Admin analytics dashboard
+- [ ] Discount codes / coupons
+- [ ] Related products
 
-### Medium-term (Month 1-2)
-1. Add inventory alerts for low stock
-2. Implement multi-currency support
-3. Add product filters by category
-4. Create admin analytics dashboard
-
-### Long-term (Quarter 1+)
-1. Implement wishlist feature
-2. Add product reviews and ratings
-3. Integrate with shipping providers (EasyPost, ShipStation)
-4. Set up subscription/membership program
+### Phase 3 (Future)
+- [ ] GST invoice generation
+- [ ] Multi-admin roles
+- [ ] Bulk product import
+- [ ] Abandoned cart recovery
+- [ ] Email notifications
+- [ ] Size guide
 
 ---
 
@@ -205,22 +251,21 @@ Project is ready for production when:
 - ✅ Environment variables configured
 - ✅ Admin account created and tested
 - ✅ UPI payment integration working with QR code
+- ✅ Customer authentication working
 - ✅ Images loading from Storage/CDN
 - ✅ No errors in logs
 - ✅ Performance under 3 seconds for LCP
 - ✅ SEO metadata tags implemented
-- ✅ Analytics tracking installed
 
 ---
 
 ## 📝 Version History
 
 - **v1.0** (Jun 6, 2026) - Initial setup guide
-- **v1.1** (TBD) - Payment integration updates
-- **v2.0** (TBD) - Multi-vendor marketplace
+- **v2.0** (Jun 22, 2026) - Updated with customer auth, search, security features
 
 ---
 
-**Last Updated:** June 6, 2026  
+**Last Updated:** June 22, 2026  
 **Maintained by:** VIP Raiments Team  
 **Contact:** support@vip-raiments.com
