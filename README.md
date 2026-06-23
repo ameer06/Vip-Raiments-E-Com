@@ -1,114 +1,226 @@
 # VIP Raiments
 
-Premium mobile-first commerce scaffold built with Next.js App Router, Tailwind CSS, Framer Motion, and Supabase.
+Premium mobile-first e-commerce platform built with Next.js App Router, Tailwind CSS, Framer Motion, and Supabase.
 
-## Project Skeleton
+## Features
+
+### Storefront
+- **Product catalog** with search and sort (by price, name, newest)
+- **Product detail pages** with size selection and image hover swap
+- **Shopping cart** with quantity controls and localStorage persistence
+- **Checkout** with UPI payment (QR code, app chooser, manual UPI ID)
+- **Order tracking** by order ID or email with status timeline
+
+### Customer Account
+- **Sign up / Sign in** with email and password
+- **Order history** showing all past orders with status
+- **Profile management** with name, phone, and default address
+- **Auto-fill checkout** for logged-in users
+
+### Admin Dashboard
+- **Product management** — create, edit, upload images, manage inventory
+- **Order management** — search, filter by status, update status, add tracking
+- **CSV export** for order data
+
+### Security
+- **Three-layer admin protection** — middleware + requireAdmin + RLS
+- **Atomic stock deduction** via Supabase RPC (prevents overselling)
+- **Server-side input validation** on all API routes
+- **Rate limiting** on payment endpoints
+- **Row Level Security** — customers see only their own orders
+
+### UX
+- **Skeleton loading states** for products, orders, and tracking
+- **Custom error pages** (404, 500)
+- **Responsive design** — mobile-first with glassmorphism header
+- **Animated hero** with trending drops marquee
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 16 (App Router) |
+| Styling | Tailwind CSS |
+| Animation | Framer Motion |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| Payments | UPI (Google Pay, PhonePe, Paytm) |
+| Hosting | Vercel |
+
+## Project Structure
 
 ```txt
 app/
-  globals.css
-  layout.tsx
-  page.tsx
-  account/page.tsx
-  admin/page.tsx
-  login/page.tsx
-  products/page.tsx
-  products/[slug]/page.tsx
+  page.tsx                    # Homepage with hero + product grid
+  layout.tsx                  # Root layout with fonts
+  not-found.tsx               # Custom 404 page
+  error.tsx                   # Custom 500 page
+  global-error.tsx            # Global error boundary
+  login/page.tsx              # Admin login
+  account/page.tsx            # Customer dashboard
+  account/login/page.tsx      # Customer login
+  account/signup/page.tsx     # Customer signup
+  products/page.tsx           # Product catalog with search/sort
+  products/[slug]/page.tsx    # Product detail
+  products/loading.tsx        # Product skeleton
+  cart/page.tsx               # Shopping cart
+  checkout/page.tsx           # Checkout with UPI
+  order/[id]/page.tsx         # Order confirmation
+  order/[id]/loading.tsx      # Order skeleton
+  track/page.tsx              # Order tracking
+  track/loading.tsx           # Tracking skeleton
+  admin/page.tsx              # Admin dashboard
 components/
   features/
-    Hero.tsx
-    ProductCard.tsx
-    ProductGrid.tsx
+    Hero.tsx                  # Homepage hero
+    ProductCard.tsx           # Product card with hover swap
+    ProductGrid.tsx           # Product grid layout
+    ProductSearchBar.tsx      # Search input
+    ProductSort.tsx           # Sort dropdown
+    ProductAddToCart.tsx      # Add to cart button
+    CartView.tsx              # Cart drawer
+    CartToast.tsx             # Cart toast notification
+    CheckoutForm.tsx          # Checkout form
+    UPIPayment.tsx            # UPI payment with QR
+    LoginForm.tsx             # Admin login form
+    CustomerDashboard.tsx     # Customer account dashboard
+    CustomerLoginForm.tsx     # Customer login form
+    CustomerSignupForm.tsx    # Customer signup form
+    CustomerOrdersList.tsx    # Customer order history
+    OrderTrackingClient.tsx   # Order tracking UI
+  admin/
+    AdminDashboardClient.tsx  # Admin product management
+    AdminOrdersTab.tsx        # Admin order management
+    AdminTabs.tsx             # Products/Orders tab switcher
   layout/
-    Footer.tsx
-    Header.tsx
-    Layout.tsx
+    Header.tsx                # Sticky header with nav
+    Footer.tsx                # Footer
+    Layout.tsx                # Layout wrapper
   ui/
-    Marquee.tsx
+    Skeleton.tsx              # Skeleton loading components
+    Marquee.tsx               # Animated marquee
 data/
-  products.ts
+  products.ts                 # Static product catalog
 hooks/
-  useCart.ts
-  useSupabaseSession.ts
+  useCart.ts                  # Cart state (localStorage)
+  useSupabaseSession.ts       # Supabase session hook
 lib/
   supabase/
-    client.ts
-    server.ts
-  utils.ts
-ADMIN_GUIDE.md
-DEPLOYMENT_GUIDE.md
+    client.ts                 # Browser client
+    server.ts                 # Server client
+    admin.ts                  # Service role client
+    public.ts                 # Public client
+  products/
+    get-products.ts           # Product fetching
+    map.ts                    # Product row mapping
+  orders/
+    types.ts                  # Order status types
+  validation.ts               # Input validation
+  rate-limit.ts               # Rate limiting
+  overrides.ts                # Product overrides
+  utils.ts                    # Utilities (cn, formatInr)
+supabase/
+  schema.sql                  # Database schema
+  seed-products.sql           # Sample products
+  migrate-order-statuses.sql  # Order status expansion
+  migrate-orders-rls.sql      # Orders RLS policies
+  migrate-customer-auth.sql   # Customer auth tables
+  migrate-atomic-stock.sql    # Atomic stock RPC
 ```
 
-## Phased Plan
+## Getting Started
 
-### MVP
+### Prerequisites
 
-- Core App Router layout, metadata, Inter font, and global Tailwind setup.
-- Sticky glassmorphism header with mobile-first navigation.
-- High-conversion homepage hero with animated entrance and trending drops marquee.
-- Product grid skeleton with hover image swap and quick-add cart chip.
-- Basic routing via `/` and `/products`.
-- Starter admin route via `/admin` with product, pricing, image, and inventory guidance.
-- Supabase environment setup using `.env.local`.
-- Local scripts for development, type checking, linting, production build, and serving.
+- Node.js 18+
+- Supabase account
+- Vercel account (for deployment)
 
-### Enhancements
+### Setup
 
-- Accessibility pass: focus traps for menus, cart drawer semantics, motion-reduction refinements, and richer aria labels.
-- Commerce components: size picker, cart drawer, checkout CTA, product detail page, collection filters, search, wishlist, and promo banner.
-- Real data wiring: Supabase tables for products, variants, inventory, carts, orders, and customer profiles.
-- Auth flows: email OTP, OAuth, account page, protected order history, and server-side session refresh middleware.
-- Analytics: conversion funnel events, product impressions, add-to-cart tracking, and checkout handoff events.
-- Performance: image CDN transforms, route-level loading states, Suspense streaming, cache tags, and bundle analysis.
+1. Clone the repository:
+```bash
+git clone https://github.com/ameer06/Vip-Raiments-E-Com.git
+cd Vip-Raiments-E-Com
+```
 
-## Environment
+2. Install dependencies:
+```bash
+npm install
+```
 
-Create `.env.local` from `.env.example`:
-
+3. Create `.env.local` from `.env.example`:
 ```bash
 cp .env.example .env.local
 ```
 
-Only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are exposed to the browser. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only and never import it in client components.
+4. Add your Supabase credentials to `.env.local`
 
-## Run Locally
-
+5. Run the development server:
 ```bash
-npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+6. Open [http://localhost:3000](http://localhost:3000)
 
-## Live Deployment
+### Database Setup
 
-- Storefront: [https://vip-raiments.vercel.app](https://vip-raiments.vercel.app)
-- Admin login: [https://vip-raiments.vercel.app/login](https://vip-raiments.vercel.app/login)
+Run these SQL files in **Supabase SQL Editor** in order:
 
-See `DEPLOYMENT_GUIDE.md` for Supabase and Vercel environment setup.
+1. `supabase/schema.sql` — Creates all tables
+2. `supabase/seed-products.sql` — Adds sample products
+3. `supabase/migrate-order-statuses.sql` — Expands order statuses
+4. `supabase/migrate-orders-rls.sql` — Updates RLS policies
+5. `supabase/migrate-customer-auth.sql` — Customer auth tables
+6. `supabase/migrate-atomic-stock.sql` — Atomic stock function
 
-## Build For Production
+### Supabase Auth Config
+
+1. Go to **Authentication → URL Configuration**
+2. Set Site URL to `https://vip-raiments.vercel.app`
+3. Add `https://vip-raiments.vercel.app` to Redirect URLs
+4. Go to **Project Settings → Email** → change Sender name to `VIP Raiments`
+
+## Deployment
+
+### Vercel
+
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables
+4. Deploy
+
+### Environment Variables
+
+| Variable | Public | Description |
+|----------|--------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | No | Supabase service role key |
+| `NEXT_PUBLIC_MERCHANT_UPI_ID` | Yes | UPI ID for payments |
+
+See `ENV_VARIABLES.md` for detailed setup instructions.
+
+## Scripts
 
 ```bash
-npm run type-check
-npm run lint
-npm run build
-npm run start
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript check
 ```
 
-## Routing Notes
+## Contributing
 
-- `/` is the conversion-focused storefront homepage.
-- `/products` reuses the product grid as a collection page.
-- `/admin` is the starter product management dashboard and should be protected before production.
-- `/login` is the Supabase admin login page used before accessing `/admin`.
-- `/account` is the starter account/admin access explainer.
-- `/admin` is server-protected: signed-out users are redirected to `/login`, and signed-in users must exist in `admin_users`.
-- Recommended next routes: `/products/[slug]`, `/cart`, `/checkout`, `/account`, and `/login`.
-- Default auth scope: Supabase browser client for public session state, server client for route handlers/server components, and service role only in trusted server-only operations.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run `npm run lint` and `npm run type-check`
+5. Commit your changes
+6. Push to the branch
+7. Create a Pull Request
 
-## Assumptions
+## License
 
-- The first release prioritizes a direct-to-consumer storefront over a marketplace.
-- Supabase auth starts with email/password or OTP, with OAuth added later.
-- Product imagery uses remote CDN URLs in development and should move to Supabase Storage or a dedicated image CDN for production.
+Private — VIP Raiments
