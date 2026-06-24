@@ -57,7 +57,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-white/30 sm:flex-row sm:px-6 lg:px-8">
           <span>&copy; {year} VIP Raiments. All rights reserved.</span>
-          <span className="font-medium">Built in India</span>
+          <span className="font-medium">Amrix labs</span>
         </div>
       </div>
     </footer>
