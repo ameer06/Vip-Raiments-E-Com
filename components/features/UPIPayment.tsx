@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
-import { Smartphone, QrCode, CreditCard, CheckCircle, XCircle } from "lucide-react";
+import { Smartphone, QrCode, CheckCircle, XCircle } from "lucide-react";
 
 type UPIPaymentProps = {
   form: {
@@ -194,11 +194,9 @@ export function UPIPayment({
     setPaymentStatus("");
   }
 
-  function openUpiApp(scheme?: string) {
+  function openUpiApp() {
     if (!upiLink) return;
-    const app = scheme ? `${scheme}://` : "";
-    const url = app ? `${app}${upiLink.slice(upiLink.indexOf("://") + 3)}` : upiLink;
-    window.location.href = url;
+    window.location.href = upiLink;
   }
 
   const mobileApps = getUpiAppsForDevice();
@@ -260,7 +258,7 @@ export function UPIPayment({
                 <button
                   key={app.scheme}
                   type="button"
-                  onClick={() => openUpiApp(app.scheme)}
+                  onClick={() => openUpiApp()}
                   className="flex flex-col items-center gap-1.5 rounded-control border border-ink/10 bg-white p-3 text-center transition-colors hover:bg-surface"
                 >
                   <div
@@ -289,35 +287,6 @@ export function UPIPayment({
             </div>
           </div>
         )}
-
-        <div className="rounded-card border border-ink/10 bg-white p-4">
-          <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 shrink-0 text-ink/40" />
-            <p className="text-xs font-semibold">Or pay to UPI ID manually</p>
-          </div>
-          <div className="mt-2 flex gap-2">
-            <input
-              type="text"
-              value={manualUpiId || "vipraimentsiq@okaxis"}
-              readOnly
-              className="h-10 flex-1 rounded-control border border-ink/20 bg-surface px-3 font-mono text-xs text-ink/70"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                if (manualUpiId || true) {
-                  navigator.clipboard?.writeText("vipraimentsiq@okaxis");
-                }
-              }}
-              className="h-10 rounded-control bg-ink px-3 text-xs font-semibold text-white"
-            >
-              Copy
-            </button>
-          </div>
-          <p className="mt-2 text-[11px] text-ink/40">
-            Open any UPI app → Pay → Enter UPI ID: <strong>vipraimentsiq@okaxis</strong> → Pay ₹{subtotal}
-          </p>
-        </div>
 
         <div className="grid gap-2">
           <button
@@ -400,10 +369,6 @@ export function UPIPayment({
         <span>•</span>
         <span className="flex items-center gap-1">
           <Smartphone className="h-3 w-3" /> Any UPI App
-        </span>
-        <span>•</span>
-        <span className="flex items-center gap-1">
-          <CreditCard className="h-3 w-3" /> Manual UPI ID
         </span>
       </div>
     </div>
