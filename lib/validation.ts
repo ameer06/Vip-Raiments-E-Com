@@ -19,7 +19,7 @@ export function isValidAmount(amount: unknown): amount is number {
 }
 
 export function isValidOrderRef(ref: string): boolean {
-  return /^ORD\d{13,}$/.test(ref);
+  return /^ORDER_\d{13,}$/.test(ref);
 }
 
 export function validateCheckoutPayload(body: Record<string, unknown>): {
