@@ -9,6 +9,11 @@ const footerLinks = {
   Help: [
     { href: "/cart", label: "Your Cart" },
     { href: "/account", label: "Account" },
+    { href: "/track", label: "Track Order" },
+  ],
+  Legal: [
+    { href: "/privacy", label: "Privacy Policy" },
+    { href: "/terms", label: "Terms of Service" },
   ],
 };
 
