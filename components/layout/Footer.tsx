@@ -7,6 +7,7 @@ const footerLinks = {
     { href: "/products?filter=pants", label: "Pants" },
   ],
   Help: [
+    { href: "/about", label: "About Us" },
     { href: "/cart", label: "Your Cart" },
     { href: "/account", label: "Account" },
     { href: "/track", label: "Track Order" },
